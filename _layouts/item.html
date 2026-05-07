@@ -1,0 +1,32 @@
+---
+layout: default
+---
+{% assign back_url = '/' | append: page.section | append: '/' %}
+{% case page.section %}
+  {% when 'projects' %}{% assign back_label = 'Projects' %}
+  {% when 'architectures' %}{% assign back_label = 'Architectures & Diagrams' %}
+  {% when 'books' %}{% assign back_label = 'Books & Trainings' %}
+  {% else %}{% assign back_label = 'Back' %}
+{% endcase %}
+<article class="page container narrow">
+  <header class="page-header">
+    <p class="eyebrow"><a href="{{ back_url | relative_url }}">{{ back_label }}</a>{% if page.role %} · {{ page.role }}{% endif %}{% if page.year %} · {{ page.year }}{% endif %}</p>
+    <h1>{{ page.title }}</h1>
+    {% if page.subtitle %}<p class="lede">{{ page.subtitle }}</p>{% endif %}
+    {% if page.tags and page.tags.size > 0 %}
+      <ul class="tags">{% for tag in page.tags %}<li>#{{ tag }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% if page.links %}
+      <ul class="links">
+        {% for link in page.links %}<li><a href="{{ link.url }}" rel="noopener">{{ link.label }} ↗</a></li>{% endfor %}
+      </ul>
+    {% endif %}
+  </header>
+  {% if page.image %}
+    <figure class="hero-figure"><img src="{{ page.image | relative_url }}" alt="{{ page.image_alt | default: page.title }}" loading="lazy"></figure>
+  {% endif %}
+  <div class="prose">
+    {{ content }}
+  </div>
+  <p class="back"><a href="{{ back_url | relative_url }}">← Back to {{ back_label }}</a></p>
+</article>

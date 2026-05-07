@@ -1,0 +1,59 @@
+---
+layout: default
+title: Books & Trainings
+permalink: /books/
+description: Books I recommend and trainings I've completed or teach.
+---
+
+<section class="page container">
+  <header class="page-header narrow">
+    <p class="eyebrow">Books &amp; Trainings</p>
+    <h1>The shelf.</h1>
+    <p class="lede">Books I recommend and trainings I've taken or teach.</p>
+  </header>
+
+  {% assign books    = site.books | where: 'kind', 'book' %}
+  {% assign trainings = site.books | where: 'kind', 'training' %}
+
+  {% if books.size > 0 %}
+    <h2 class="section-divider">Books</h2>
+    <ul class="grid reveal-children">
+      {% for item in books %}
+        <li class="grid-card">
+          <a href="{{ item.url | relative_url }}">
+            {% if item.image %}<div class="grid-thumb cover"><img src="{{ item.image | relative_url }}" alt="{{ item.title }} cover" loading="lazy"></div>{% endif %}
+            <div class="grid-body">
+              <p class="eyebrow">{% if item.author %}{{ item.author }}{% endif %}{% if item.year %} · {{ item.year }}{% endif %}</p>
+              <h3>{{ item.title }}</h3>
+              {% if item.subtitle %}<p class="muted">{{ item.subtitle }}</p>{% endif %}
+              {% if item.tags %}<ul class="tags small">{% for t in item.tags %}<li>{{ t }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if trainings.size > 0 %}
+    <h2 class="section-divider">Trainings &amp; Certifications</h2>
+    <ul class="grid reveal-children">
+      {% for item in trainings %}
+        <li class="grid-card">
+          <a href="{{ item.url | relative_url }}">
+            {% if item.image %}<div class="grid-thumb"><img src="{{ item.image | relative_url }}" alt="{{ item.title }}" loading="lazy"></div>{% endif %}
+            <div class="grid-body">
+              <p class="eyebrow">{% if item.provider %}{{ item.provider }}{% endif %}{% if item.year %} · {{ item.year }}{% endif %}</p>
+              <h3>{{ item.title }}</h3>
+              {% if item.subtitle %}<p class="muted">{{ item.subtitle }}</p>{% endif %}
+              {% if item.tags %}<ul class="tags small">{% for t in item.tags %}<li>{{ t }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if books.size == 0 and trainings.size == 0 %}
+    <p class="muted">Nothing on the shelf yet.</p>
+  {% endif %}
+</section>

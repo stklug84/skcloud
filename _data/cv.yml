@@ -1,0 +1,85 @@
+name: Steffen Klug
+title: Cloud Architect
+location: Germany
+summary: >-
+  Cloud architect focused on Azure landing zones, Kubernetes platforms,
+  and the developer experience that makes them a pleasure to use.
+
+# Each role appears as a "scene" in the scrollable CV.
+# - period: short label shown in the sticky left column
+# - year:   used for the timeline marker
+# - role:   role title
+# - org:    company / organization
+# - tags:   small keyword chips
+# - bullets: highlight points
+roles:
+  - period: "2024 — Now"
+    year: 2024
+    role: "Lead Cloud Architect"
+    org: "Confidential Enterprise Client"
+    location: "Hybrid · Germany"
+    summary: >-
+      Leading the design of a multi-subscription Azure platform for a global
+      enterprise — landing zones, networking, identity, and the paved-path
+      developer experience on top.
+    tags: [Azure, Landing Zones, Bicep, AKS, Platform Engineering]
+    bullets:
+      - "Rolled out a policy-as-code framework with Bicep and GitHub Actions."
+      - "Designed a self-service onboarding portal used by 30+ product teams."
+      - "Cut average time-to-first-deploy from weeks to a single day."
+
+  - period: "2022 — 2024"
+    year: 2022
+    role: "Senior Cloud Engineer"
+    org: "Independent / Consulting"
+    location: "Remote"
+    summary: >-
+      Worked with several mid-size organizations to modernize workloads on
+      Azure — from VM-based estates to containerized, event-driven systems.
+    tags: [Azure, AKS, Terraform, GitOps, Observability]
+    bullets:
+      - "Migrated legacy estates to AKS with GitOps and managed Prometheus."
+      - "Introduced Terraform modules and golden paths for product teams."
+      - "Mentored engineers on cloud-native patterns and SRE practices."
+
+  - period: "2019 — 2022"
+    year: 2019
+    role: "DevOps Engineer"
+    org: "Earlier Employer"
+    location: "Germany"
+    summary: >-
+      Built CI/CD pipelines and developer tooling for a fast-growing product
+      organization, with a focus on safe, frequent releases.
+    tags: [GitHub Actions, Docker, Kubernetes, IaC]
+    bullets:
+      - "Designed reusable CI/CD workflows shared across 50+ repositories."
+      - "Introduced trunk-based development and progressive delivery."
+      - "Built internal CLIs and dashboards to reduce platform friction."
+
+  - period: "Before 2019"
+    year: 2015
+    role: "Software & Systems Engineer"
+    org: "Various"
+    location: "Germany"
+    summary: >-
+      Earlier roles spanning software engineering, systems administration,
+      and the gradual shift from on-prem to cloud-first architectures.
+    tags: [Linux, Networking, Automation]
+    bullets:
+      - "Operated and automated on-prem and hybrid infrastructure."
+      - "Picked up the cloud habit early — and never looked back."
+
+certifications:
+  - "Microsoft Certified: Azure Solutions Architect Expert (AZ-305)"
+  - "Microsoft Certified: DevOps Engineer Expert (AZ-400)"
+  - "Microsoft Certified: Azure Administrator Associate (AZ-104)"
+
+skills:
+  - group: "Cloud"
+    items: ["Azure", "Landing Zones", "Networking", "Identity", "FinOps"]
+  - group: "Platforms"
+    items: ["Kubernetes / AKS", "Container Apps", "App Service", "Functions"]
+  - group: "IaC & Delivery"
+    items: ["Bicep", "Terraform", "GitHub Actions", "GitOps / Flux"]
+  - group: "Practice"
+    items: ["Platform Engineering", "DX", "SRE", "Mentoring"]

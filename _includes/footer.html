@@ -1,0 +1,10 @@
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="muted">© {{ 'now' | date: '%Y' }} {{ site.author }}. Built with Jekyll on GitHub Pages.</p>
+    <ul class="social">
+      {% if site.social.github %}<li><a href="https://github.com/{{ site.social.github }}" rel="me noopener">GitHub</a></li>{% endif %}
+      {% if site.social.linkedin %}<li><a href="{{ site.social.linkedin }}" rel="me noopener">LinkedIn</a></li>{% endif %}
+      <li><a href="{{ '/feed.xml' | relative_url }}">RSS</a></li>
+    </ul>
+  </div>
+</footer>

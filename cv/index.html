@@ -1,0 +1,87 @@
+---
+layout: default
+title: CV
+permalink: /cv/
+description: A scrollable CV — career, skills, and certifications.
+---
+
+{% assign cv = site.data.cv %}
+
+<section class="cv">
+  <div class="container">
+    <header class="page-header narrow">
+      <p class="eyebrow">CV</p>
+      <h1>{{ cv.name }} — {{ cv.title }}</h1>
+      <p class="lede">{{ cv.summary }}</p>
+    </header>
+  </div>
+
+  <div class="cv-scroll container">
+    <aside class="cv-aside">
+      <div class="cv-sticky">
+        <p class="eyebrow">Career</p>
+        <ol class="cv-timeline" aria-hidden="true">
+          {% for r in cv.roles %}
+            <li data-target="role-{{ forloop.index }}">
+              <span class="dot"></span>
+              <span class="period">{{ r.period }}</span>
+              <span class="role-mini">{{ r.role }}</span>
+            </li>
+          {% endfor %}
+        </ol>
+      </div>
+    </aside>
+
+    <div class="cv-stage">
+      {% for r in cv.roles %}
+        <article class="cv-scene" id="role-{{ forloop.index }}" data-index="{{ forloop.index }}">
+          <p class="eyebrow">{{ r.period }} · {{ r.org }}</p>
+          <h2>{{ r.role }}</h2>
+          <p class="muted">{{ r.location }}</p>
+          <p class="lede">{{ r.summary }}</p>
+          {% if r.bullets %}
+            <ul class="bullets">
+              {% for b in r.bullets %}<li>{{ b }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+          {% if r.tags %}
+            <ul class="tags">
+              {% for t in r.tags %}<li>{{ t }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="container narrow">
+    <section class="cv-extra reveal-children">
+      <header class="section-head">
+        <p class="eyebrow">Skills</p>
+        <h2>What I work with.</h2>
+      </header>
+      <ul class="skill-groups">
+        {% for g in cv.skills %}
+          <li>
+            <h3>{{ g.group }}</h3>
+            <ul class="tags">
+              {% for s in g.items %}<li>{{ s }}</li>{% endfor %}
+            </ul>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    {% if cv.certifications and cv.certifications.size > 0 %}
+      <section class="cv-extra reveal-children">
+        <header class="section-head">
+          <p class="eyebrow">Certifications</p>
+          <h2>Verified credentials.</h2>
+        </header>
+        <ul class="cert-list">
+          {% for c in cv.certifications %}<li>{{ c }}</li>{% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+  </div>
+</section>
