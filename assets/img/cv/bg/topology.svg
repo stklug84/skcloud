@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <radialGradient id="g1" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#2d4a6b" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#2d4a6b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#g1)"/>
+  <g fill="none" stroke="#2d4a6b" stroke-opacity="0.35" stroke-width="1.2">
+    <circle cx="800" cy="500" r="80"/>
+    <circle cx="800" cy="500" r="220"/>
+    <circle cx="800" cy="500" r="380"/>
+    <circle cx="300" cy="220" r="36"/>
+    <circle cx="1300" cy="240" r="36"/>
+    <circle cx="260" cy="780" r="36"/>
+    <circle cx="1340" cy="780" r="36"/>
+    <circle cx="800" cy="120" r="28"/>
+    <circle cx="800" cy="880" r="28"/>
+    <line x1="300" y1="220" x2="800" y2="500"/>
+    <line x1="1300" y1="240" x2="800" y2="500"/>
+    <line x1="260" y1="780" x2="800" y2="500"/>
+    <line x1="1340" y1="780" x2="800" y2="500"/>
+    <line x1="800" y1="120" x2="800" y2="500"/>
+    <line x1="800" y1="880" x2="800" y2="500"/>
+    <line x1="300" y1="220" x2="800" y2="120"/>
+    <line x1="1300" y1="240" x2="800" y2="120"/>
+    <line x1="260" y1="780" x2="800" y2="880"/>
+    <line x1="1340" y1="780" x2="800" y2="880"/>
+  </g>
+  <g fill="#2d4a6b" fill-opacity="0.55">
+    <circle cx="800" cy="500" r="6"/>
+    <circle cx="300" cy="220" r="4"/>
+    <circle cx="1300" cy="240" r="4"/>
+    <circle cx="260" cy="780" r="4"/>
+    <circle cx="1340" cy="780" r="4"/>
+    <circle cx="800" cy="120" r="4"/>
+    <circle cx="800" cy="880" r="4"/>
+  </g>
+</svg>

@@ -9,22 +9,31 @@ description: A scrollable CV — career, skills, and certifications.
 
 <section class="cv">
   <div class="container">
-    <header class="page-header narrow">
+    <header class="page-header narrow cv-intro">
       <p class="eyebrow">CV</p>
-      <h1>{{ cv.name }} — {{ cv.title }}</h1>
+      <h1>{{ cv.name }} <span class="muted">— {{ cv.title }}</span></h1>
       <p class="lede">{{ cv.summary }}</p>
     </header>
   </div>
 
-  <div class="cv-scroll container">
-    <aside class="cv-aside">
+  <div class="cv-scroll container" data-cv-root>
+
+    {%- comment -%} Phasing background canvas — two layers cross-fade. {%- endcomment -%}
+    <div class="cv-bg" aria-hidden="true">
+      <div class="cv-bg-layer is-active" data-cv-bg="a"></div>
+      <div class="cv-bg-layer" data-cv-bg="b"></div>
+      <div class="cv-bg-vignette"></div>
+    </div>
+
+    {%- comment -%} Left rail: dates + active dot timeline (sticky). {%- endcomment -%}
+    <aside class="cv-rail cv-rail-left" aria-label="Career timeline">
       <div class="cv-sticky">
         <p class="eyebrow">Career</p>
-        <ol class="cv-timeline" aria-hidden="true">
+        <ol class="cv-timeline">
           {% for r in cv.roles %}
             <li data-target="role-{{ forloop.index }}">
-              <span class="dot"></span>
-              <span class="period">{{ r.period }}</span>
+              <span class="dot" aria-hidden="true"></span>
+              <span class="period tabular">{{ r.period }}</span>
               <span class="role-mini">{{ r.role }}</span>
             </li>
           {% endfor %}
@@ -32,10 +41,17 @@ description: A scrollable CV — career, skills, and certifications.
       </div>
     </aside>
 
+    {%- comment -%} Center: scenes. {%- endcomment -%}
     <div class="cv-stage">
       {% for r in cv.roles %}
-        <article class="cv-scene" id="role-{{ forloop.index }}" data-index="{{ forloop.index }}">
-          <p class="eyebrow">{{ r.period }} · {{ r.org }}</p>
+        {%- assign idx = forloop.index -%}
+        <article
+          class="cv-scene"
+          id="role-{{ idx }}"
+          data-index="{{ idx }}"
+          {% if r.bg %}data-bg="{{ r.bg | relative_url }}"{% endif %}
+        >
+          <p class="eyebrow tabular">{{ r.period }} · {{ r.org }}</p>
           <h2>{{ r.role }}</h2>
           <p class="muted">{{ r.location }}</p>
           <p class="lede">{{ r.summary }}</p>
@@ -52,6 +68,24 @@ description: A scrollable CV — career, skills, and certifications.
         </article>
       {% endfor %}
     </div>
+
+    {%- comment -%} Right rail: per-scene crest / monogram (sticky-stack). {%- endcomment -%}
+    <aside class="cv-rail cv-rail-right" aria-hidden="true">
+      <ol class="cv-cues">
+        {% for r in cv.roles %}
+          <li class="cv-cue" data-target="role-{{ forloop.index }}" data-kind="{{ r.kind | default: 'work' }}">
+            <div class="cv-cue-frame">
+              {% if r.logo %}
+                <img src="{{ r.logo | relative_url }}" alt="" loading="lazy" decoding="async">
+              {% else %}
+                <span class="cv-cue-monogram">{{ r.monogram | default: r.org | slice: 0, 2 | upcase }}</span>
+              {% endif %}
+            </div>
+            <span class="cv-cue-org">{{ r.org }}</span>
+          </li>
+        {% endfor %}
+      </ol>
+    </aside>
   </div>
 
   <div class="container narrow">

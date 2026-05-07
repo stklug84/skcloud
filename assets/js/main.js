@@ -111,6 +111,35 @@
   // ---------- CV scrollorama ----------
   var cvScenes = Array.prototype.slice.call(document.querySelectorAll('.cv-scene'));
   var cvNav = Array.prototype.slice.call(document.querySelectorAll('.cv-timeline li'));
+  var cvCues = Array.prototype.slice.call(document.querySelectorAll('.cv-cue'));
+  var bgLayers = Array.prototype.slice.call(document.querySelectorAll('.cv-bg-layer'));
+  var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Cross-fade two background layers between scenes.
+  // We use two layers so background-image swaps don't flicker.
+  var bgState = { current: 0, lastUrl: '' };
+  function setSceneBg(url) {
+    if (!bgLayers.length || prefersReduced) return;
+    if (!url) {
+      bgLayers.forEach(function (l) { l.classList.remove('is-active'); });
+      bgState.lastUrl = '';
+      return;
+    }
+    if (url === bgState.lastUrl) return;
+    bgState.lastUrl = url;
+    var next = (bgState.current + 1) % 2;
+    var nextLayer = bgLayers[next];
+    var prevLayer = bgLayers[bgState.current];
+    nextLayer.style.backgroundImage = 'url("' + url + '")';
+    // double-RAF to ensure the new image is decoded before fading
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        nextLayer.classList.add('is-active');
+        if (prevLayer) prevLayer.classList.remove('is-active');
+        bgState.current = next;
+      });
+    });
+  }
 
   if (cvScenes.length) {
     // Reveal scenes
@@ -128,15 +157,22 @@
       cvScenes.forEach(function (s) { s.classList.add('is-visible'); });
     }
 
-    // Active-state tracking on left timeline
-    if ('IntersectionObserver' in window && cvNav.length) {
+    // Active-state tracking — drives left timeline, right rail, and bg.
+    if ('IntersectionObserver' in window) {
       var setActive = function (id) {
         cvNav.forEach(function (li) {
           li.classList.toggle('is-active', li.getAttribute('data-target') === id);
         });
+        cvCues.forEach(function (li) {
+          li.classList.toggle('is-active', li.getAttribute('data-target') === id);
+        });
+        var scene = document.getElementById(id);
+        if (scene) {
+          var url = scene.getAttribute('data-bg');
+          setSceneBg(url);
+        }
       };
       var activeIO = new IntersectionObserver(function (entries) {
-        // pick the entry closest to the top of the viewport that is intersecting
         var visible = entries.filter(function (e) { return e.isIntersecting; });
         if (!visible.length) return;
         visible.sort(function (a, b) {
@@ -149,7 +185,7 @@
       // initialize first as active
       setActive(cvScenes[0].id);
 
-      // click to scroll
+      // click to scroll — left timeline
       cvNav.forEach(function (li) {
         li.addEventListener('click', function () {
           var id = li.getAttribute('data-target');

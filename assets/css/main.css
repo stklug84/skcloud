@@ -9,10 +9,15 @@
   --c-bg-alt: #efece6;
   --c-surface: #ffffff;
   --c-text: #1b1b1a;
+  --c-ink: #0b0c0e;
   --c-text-muted: #6b6a66;
   --c-line: #e3dfd6;
   --c-accent: #c8553d;
   --c-accent-soft: #e8b4a7;
+  --c-blueprint: #2d4a6b;
+  --c-blueprint-soft: #c9d6e4;
+  --c-success: #3f7d58;
+  --c-grid-line: rgba(43, 74, 107, 0.08);
   --c-link: #1b1b1a;
 
   --radius: 14px;
@@ -22,13 +27,15 @@
   --maxw: 1120px;
   --maxw-narrow: 760px;
 
-  --f-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter,
-            Roboto, "Helvetica Neue", Arial, sans-serif;
+  --f-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system,
+            "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
   --f-serif: ui-serif, Georgia, "Times New Roman", serif;
-  --f-mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace;
+  --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, "JetBrains Mono",
+            Menlo, monospace;
 
   --t-fast: 160ms cubic-bezier(.4,.0,.2,1);
   --t-med:  280ms cubic-bezier(.4,.0,.2,1);
+  --t-slow: 600ms cubic-bezier(.2,.7,.2,1);
 }
 
 html[data-resolved="dark"],
@@ -37,10 +44,15 @@ html[data-theme="dark"] {
   --c-bg-alt: #14171d;
   --c-surface: #181c23;
   --c-text: #ececea;
+  --c-ink: #ffffff;
   --c-text-muted: #9a9b97;
   --c-line: #262a31;
   --c-accent: #e89180;
   --c-accent-soft: #3a2620;
+  --c-blueprint: #7fa6cf;
+  --c-blueprint-soft: #1d2a3a;
+  --c-success: #7cb693;
+  --c-grid-line: rgba(127, 166, 207, 0.10);
   --c-link: #ececea;
   --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
   --shadow-md: 0 8px 32px rgba(0,0,0,.5);
@@ -52,10 +64,15 @@ html[data-theme="dark"] {
     --c-bg-alt: #14171d;
     --c-surface: #181c23;
     --c-text: #ececea;
+    --c-ink: #ffffff;
     --c-text-muted: #9a9b97;
     --c-line: #262a31;
     --c-accent: #e89180;
     --c-accent-soft: #3a2620;
+    --c-blueprint: #7fa6cf;
+    --c-blueprint-soft: #1d2a3a;
+    --c-success: #7cb693;
+    --c-grid-line: rgba(127, 166, 207, 0.10);
     --c-link: #ececea;
     --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
     --shadow-md: 0 8px 32px rgba(0,0,0,.5);
@@ -74,8 +91,10 @@ body {
   background: var(--c-bg);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "cv11", "kern";
   transition: background var(--t-med), color var(--t-med);
 }
+.tabular { font-variant-numeric: tabular-nums; letter-spacing: 0; }
 img, svg { max-width: 100%; display: block; }
 a { color: var(--c-link); text-decoration: none; }
 a:hover { color: var(--c-accent); }
@@ -333,19 +352,53 @@ html[data-resolved="dark"] .theme-toggle .i-moon { display: none; }
 
 /* ---------- CV / scrollorama ---------- */
 .cv { padding: clamp(56px, 8vw, 96px) 0 clamp(72px, 9vw, 120px); }
+.cv-intro h1 .muted { font-weight: 400; }
 
+/* Three-track grid:
+   [ left rail dates ] [ center stage ] [ right rail icons ]
+   The phasing background canvas sits absolutely behind the center column. */
 .cv-scroll {
+  position: relative;
   display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 56px;
+  grid-template-columns: 180px 1fr 120px;
+  gap: clamp(24px, 4vw, 56px);
   margin-top: 32px;
   align-items: start;
 }
 
-.cv-aside { position: relative; }
+/* --- Phasing background canvas (two layers cross-fade) --- */
+.cv-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+.cv-bg-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  filter: blur(6px) saturate(60%);
+  transition: opacity var(--t-slow) ease;
+  will-change: opacity;
+}
+.cv-bg-layer.is-active { opacity: 0.15; }
+html[data-resolved="dark"] .cv-bg-layer.is-active { opacity: 0.28; }
+.cv-bg-vignette {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(60% 60% at 50% 40%, transparent, var(--c-bg) 100%);
+  mix-blend-mode: normal;
+}
+
+/* --- Left rail: dates + active dot timeline --- */
+.cv-rail { position: relative; z-index: 1; }
 .cv-sticky {
   position: sticky;
-  top: 100px; /* clears the sticky header */
+  top: 100px;
   padding: 8px 0;
 }
 .cv-sticky .eyebrow { margin-bottom: 16px; }
@@ -376,11 +429,13 @@ html[data-resolved="dark"] .theme-toggle .i-moon { display: none; }
   transition: background var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
 }
 .cv-timeline .period {
-  font-size: .78rem; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--c-text-muted); font-weight: 600;
+  font-family: var(--f-mono);
+  font-size: .76rem; letter-spacing: .04em;
+  color: var(--c-text-muted); font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 .cv-timeline .role-mini {
-  font-size: .98rem; font-weight: 600; color: var(--c-text);
+  font-size: .92rem; font-weight: 600; color: var(--c-text);
   letter-spacing: -.01em;
 }
 .cv-timeline li.is-active .dot {
@@ -391,19 +446,38 @@ html[data-resolved="dark"] .theme-toggle .i-moon { display: none; }
 .cv-timeline li.is-active { background: var(--c-bg-alt); }
 .cv-timeline li.is-active .period { color: var(--c-accent); }
 
-.cv-stage { display: flex; flex-direction: column; gap: clamp(64px, 10vw, 120px); }
+/* --- Center stage --- */
+.cv-stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(64px, 10vw, 120px);
+}
 .cv-scene {
   scroll-margin-top: 120px;
-  background: var(--c-surface);
+  background: color-mix(in oklab, var(--c-surface) 92%, transparent);
   border: 1px solid var(--c-line);
   border-radius: var(--radius-lg);
   padding: clamp(28px, 4vw, 44px);
   box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
   opacity: 0; transform: translateY(28px);
   transition: opacity 600ms ease, transform 600ms cubic-bezier(.2,.7,.2,1);
 }
 .cv-scene.is-visible { opacity: 1; transform: none; }
-.cv-scene h2 { font-size: clamp(1.5rem, 2.4vw, 2rem); margin-bottom: 4px; }
+.cv-scene h2 {
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  margin-bottom: 4px;
+  color: var(--c-ink);
+}
+.cv-scene .eyebrow {
+  font-family: var(--f-mono);
+  letter-spacing: .04em;
+  text-transform: none;
+  font-size: .8rem;
+}
 .cv-scene .lede { margin-top: 12px; font-size: 1.05rem; color: var(--c-text); }
 .cv-scene .bullets {
   list-style: none; padding: 0; margin: 18px 0 0;
@@ -416,6 +490,58 @@ html[data-resolved="dark"] .theme-toggle .i-moon { display: none; }
   content: ""; position: absolute; left: 0; top: 11px;
   width: 8px; height: 8px; border-radius: 50%;
   background: var(--c-accent);
+}
+
+/* --- Right rail: per-scene icon / monogram cues --- */
+.cv-rail-right { position: relative; z-index: 1; }
+.cv-cues {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column;
+  gap: clamp(64px, 10vw, 120px);
+}
+.cv-cue {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 8px;
+  padding-top: clamp(28px, 4vw, 44px); /* align with scene padding */
+  text-align: center;
+  opacity: 0.55;
+  transition: opacity var(--t-med);
+}
+.cv-cue.is-active { opacity: 1; }
+.cv-cue-frame {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  display: inline-flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--t-fast), transform var(--t-fast),
+              box-shadow var(--t-fast);
+}
+.cv-cue.is-active .cv-cue-frame {
+  border-color: color-mix(in oklab, var(--c-accent) 60%, var(--c-line));
+  transform: scale(1.05);
+  box-shadow:
+    0 0 0 4px color-mix(in oklab, var(--c-accent) 18%, transparent),
+    var(--shadow-sm);
+}
+.cv-cue-frame img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
+.cv-cue-monogram {
+  font-family: var(--f-mono);
+  font-weight: 600;
+  font-size: .95rem;
+  letter-spacing: .02em;
+  color: var(--c-blueprint);
+}
+html[data-resolved="dark"] .cv-cue-monogram { color: var(--c-blueprint); }
+.cv-cue-org {
+  font-size: .72rem;
+  font-family: var(--f-mono);
+  letter-spacing: .02em;
+  color: var(--c-text-muted);
+  max-width: 100px;
+  line-height: 1.25;
 }
 
 .cv-extra { margin-top: clamp(64px, 9vw, 96px); }
@@ -437,14 +563,27 @@ html[data-resolved="dark"] .theme-toggle .i-moon { display: none; }
   content: "✓"; color: var(--c-accent); font-weight: 700; margin-right: 10px;
 }
 
-@media (max-width: 880px) {
+/* Tablet: drop right rail, keep dates on left */
+@media (max-width: 1024px) {
+  .cv-scroll { grid-template-columns: 160px 1fr; }
+  .cv-rail-right { display: none; }
+}
+
+/* Mobile: collapse all rails into single column */
+@media (max-width: 720px) {
   .cv-scroll { grid-template-columns: 1fr; gap: 28px; }
   .cv-sticky { position: static; padding-bottom: 0; }
   .cv-timeline { flex-direction: row; flex-wrap: wrap; gap: 6px; }
   .cv-timeline::before { display: none; }
-  .cv-timeline li { padding: 6px 12px; border: 1px solid var(--c-line); border-radius: 999px; }
+  .cv-timeline li {
+    padding: 6px 12px;
+    border: 1px solid var(--c-line);
+    border-radius: 999px;
+  }
   .cv-timeline .dot { display: none; }
-  .cv-timeline .period { display: none; }
+  .cv-timeline .role-mini { display: none; }
+  .cv-bg { display: none; }
+  .cv-scene { backdrop-filter: none; -webkit-backdrop-filter: none; }
 }
 
 /* ---------- Footer ---------- */
@@ -480,6 +619,27 @@ html[data-resolved="dark"] .theme-toggle .i-moon { display: none; }
     scroll-behavior: auto !important;
   }
   .reveal, .reveal-children > *, .cv-scene { opacity: 1 !important; transform: none !important; }
+  .cv-bg-layer { transition: none !important; }
+  .cv-cue { opacity: 1 !important; }
+}
+
+/* ---------- Scroll-driven enhancement (Chromium) ----------
+   When the browser supports CSS Scroll-Driven Animations, scenes get a
+   smoother view-timeline reveal. Falls back silently to IntersectionObserver. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cv-scene {
+      /* Override IO-driven defaults so animation is fully scroll-linked. */
+      opacity: 0;
+      transform: translateY(28px);
+      animation: cv-scene-reveal both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 25%;
+    }
+  }
+}
+@keyframes cv-scene-reveal {
+  to { opacity: 1; transform: none; }
 }
 
 /* ---------- Focus ---------- */
