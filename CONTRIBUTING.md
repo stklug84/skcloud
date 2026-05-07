@@ -87,12 +87,22 @@ cd skcloud
 bundle install
 ```
 
-If you don't have a system Ruby 3.3 you can use Docker instead:
+If you don't have a system Ruby 3.3 (or you're on macOS Homebrew where
+`ruby@3.3` is currently symlinked to Ruby 4), use Docker:
 
 ```bash
-docker run --rm -it -p 4000:4000 -v "$PWD:/srv/jekyll" \
-  jekyll/jekyll:3.9 jekyll serve --host 0.0.0.0
+docker run --rm -it -p 4000:4000 -v "$PWD:/work" -w /work ruby:3.3.11-slim bash -c "
+  apt-get update -qq && apt-get install -y -qq build-essential git >/dev/null
+  gem install bundler --no-document
+  bundle install
+  bundle exec jekyll serve --host 0.0.0.0
+"
 ```
+
+> **Why not the official `jekyll/jekyll` image?** It ships Jekyll 3.9 +
+> liquid 4.0.3, which has a `String#tainted?` call that breaks on modern
+> Ruby. We pin `github-pages ~> 232` to avoid this — see the README's
+> [pinned versions](./README.md#pinned-versions) section.
 
 ---
 

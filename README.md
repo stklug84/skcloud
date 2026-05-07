@@ -481,24 +481,42 @@ bundle exec jekyll serve --baseurl "/canary"
 # now open http://localhost:4000/canary/
 ```
 
-#### Ruby 3.4+ note
+#### Pinned versions
 
-Ruby 3.4 removed several libraries (`csv`, `bigdecimal`, `logger`, `base64`)
-from the standard library that older Jekyll 3.9 (the version pinned by
-`github-pages`) still requires. The `Gemfile` already adds them back, so
-modern Ruby works.
+The `Gemfile` pins **`github-pages ~> 232`**, which transitively gives:
+
+| Gem            | Version  | Why it matters                                      |
+| -------------- | -------- | --------------------------------------------------- |
+| `jekyll`       | 3.10.0   | Matches what GitHub Pages currently runs            |
+| `liquid`       | 4.0.4    | **Required.** `4.0.3` calls `String#tainted?` which Ruby 3.2+ removed — builds break on Ruby 3.3 runners |
+| `kramdown`     | 2.4.0    | Markdown engine                                     |
+| `rouge`        | 3.30.0   | Syntax highlighter                                  |
+
+> **Don't downgrade `github-pages` below 232.** v223 hard-pinned
+> `liquid = 4.0.3` and breaks on the Ruby 3.3.x that GitHub Actions ships.
+
+The `Gemfile` also adds back `csv`, `bigdecimal`, `logger`, and `base64`,
+which Ruby 3.4+ moved out of the default stdlib but Jekyll still requires.
+These are harmless on Ruby 3.3.
 
 #### Ruby 4 note
 
-At the time of writing, `liquid 4.0.3` (pinned by the `github-pages`
-metagem) calls `String#tainted?`, which Ruby 4 removed. **CI is unaffected**
-because both workflows pin Ruby 3.3. If you're on macOS Homebrew where
-`ruby@3.3` is symlinked to Ruby 4, install a real Ruby 3.3 with `mise`,
-`rbenv`, `asdf`, or use Docker:
+If you're on a system where the default Ruby is 4.0+ (some macOS Homebrew
+setups symlink `ruby@3.3` to Ruby 4), gem resolution will fail because
+`commonmarker` doesn't support Ruby 4 yet. **CI is unaffected** because
+the workflow pins Ruby 3.3.11. To preview locally, use a real Ruby 3.3 via
+`mise`/`rbenv`/`asdf`, or use Docker:
 
 ```bash
-docker run --rm -it -p 4000:4000 -v "$PWD:/srv/jekyll" \
-  jekyll/jekyll:3.9 jekyll serve --host 0.0.0.0
+# Resolve gems and run a build in a Ruby 3.3 container
+docker run --rm -v "$PWD:/work" -w /work ruby:3.3.11-slim bash -c "
+  apt-get update -qq && apt-get install -y -qq build-essential git >/dev/null
+  gem install bundler --no-document
+  bundle install
+  bundle exec jekyll serve --host 0.0.0.0
+"
+
+# Then open http://localhost:4000
 ```
 
 ### Useful commands
