@@ -52,9 +52,18 @@ header navigation defined in `_config.yml` (`site.nav`):
 | Architectures & Diagrams | `/architectures/`| `_architectures/*.md` coll.  | `architectures/index.html`  |
 | Books & Trainings        | `/books/`        | `_books/*.md` collection     | `books/index.html`          |
 | CV                       | `/cv/`           | `_data/cv.yml`               | `cv/index.html`             |
+| Impressum                | `/impressum/`    | `site.legal` in `_config.yml`| `impressum/index.html`      |
+| Datenschutz              | `/datenschutz/`  | `site.legal` in `_config.yml`| `datenschutz/index.html`    |
 
 The CV uses a YAML data file (instead of a collection) because all roles are
 rendered on a single scrolling page — there are no per-role detail pages.
+
+The Impressum and Datenschutz pages are bilingual (German legally binding,
+English translation) and EU-compliant for a private, non-commercial site
+hosted on GitHub Pages. They read all personal data from `site.legal` in
+`_config.yml` — fill in `name`, `street`, `postal_code`, `city`, `email`
+**before going live**. Empty fields render as `TODO …` placeholders so it's
+obvious what still needs filling in.
 
 ---
 

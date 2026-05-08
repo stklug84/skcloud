@@ -364,6 +364,11 @@ html[data-resolved="dark"] .theme-toggle .i-moon { display: none; }
   gap: clamp(24px, 4vw, 56px);
   margin-top: 32px;
   align-items: start;
+  /* Continuous progress (0..1) — written per scroll frame by main.js */
+  --cv-rail-fill: 0;
+  --cv-active-index: 0;
+  --cv-active-progress: 0;
+  --cv-bg-opacity: 0;
 }
 
 /* --- Phasing background canvas (two layers cross-fade) --- */
@@ -385,8 +390,11 @@ html[data-resolved="dark"] .theme-toggle .i-moon { display: none; }
   transition: opacity var(--t-slow) ease;
   will-change: opacity;
 }
-.cv-bg-layer.is-active { opacity: 0.15; }
-html[data-resolved="dark"] .cv-bg-layer.is-active { opacity: 0.28; }
+/* Scrubbed: opacity is the active scene's progress curve (sin(πp), 0..1). */
+.cv-bg-layer.is-active { opacity: calc(var(--cv-bg-opacity, 0) * 0.15); }
+html[data-resolved="dark"] .cv-bg-layer.is-active {
+  opacity: calc(var(--cv-bg-opacity, 0) * 0.28);
+}
 .cv-bg-vignette {
   position: absolute; inset: 0;
   background:
@@ -413,38 +421,57 @@ html[data-resolved="dark"] .cv-bg-layer.is-active { opacity: 0.28; }
   left: 6px; top: 6px; bottom: 6px; width: 2px;
   background: var(--c-line); border-radius: 2px;
 }
+/* Filled progress rail — full-height gradient, revealed top-down via inset. */
+.cv-timeline::after {
+  content: ""; position: absolute;
+  left: 6px; top: 6px; bottom: 6px; width: 2px;
+  background: linear-gradient(to bottom,
+              var(--c-accent) 0%, var(--c-blueprint) 100%);
+  border-radius: 2px;
+  /* clip from the bottom up; (1 - fill) of the rail height is hidden */
+  clip-path: inset(0 0 calc((1 - var(--cv-rail-fill, 0)) * 100%) 0);
+  transition: clip-path 120ms linear;
+  will-change: clip-path;
+}
 .cv-timeline li {
+  --p: 0; /* per-item progress 0..1 — written by main.js */
   position: relative;
   padding: 10px 8px 10px 28px;
   border-radius: 10px;
   cursor: pointer;
-  transition: background var(--t-fast), color var(--t-fast);
   display: flex; flex-direction: column; gap: 2px;
+  background: color-mix(in oklab, var(--c-bg-alt) calc(var(--p) * 100%), transparent);
+  transition: background 120ms linear;
 }
-.cv-timeline li:hover { background: var(--c-bg-alt); }
+.cv-timeline li:hover {
+  background: color-mix(in oklab, var(--c-bg-alt)
+                        calc(max(var(--p), 0.6) * 100%), transparent);
+}
+
+/* Continuous dot ramp: empty → filled as --p goes 0 → 1 */
 .cv-timeline .dot {
   position: absolute; left: 0; top: 16px;
   width: 14px; height: 14px; border-radius: 50%;
-  background: var(--c-bg); border: 2px solid var(--c-line);
-  transition: background var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
+  background: color-mix(in oklab, var(--c-accent) calc(var(--p) * 100%), var(--c-bg));
+  border: 2px solid color-mix(in oklab, var(--c-accent) calc(var(--p) * 100%), var(--c-line));
+  transform: scale(calc(1 + var(--p) * 0.18));
+  box-shadow: 0 0 0 calc(var(--p) * 4px)
+              color-mix(in oklab, var(--c-accent) 25%, transparent);
+  transition: background 120ms linear, border-color 120ms linear,
+              transform 120ms linear, box-shadow 120ms linear;
 }
 .cv-timeline .period {
   font-family: var(--f-mono);
   font-size: .76rem; letter-spacing: .04em;
-  color: var(--c-text-muted); font-weight: 500;
+  color: color-mix(in oklab, var(--c-accent) calc(var(--p) * 100%), var(--c-text-muted));
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
+  transition: color 120ms linear;
 }
 .cv-timeline .role-mini {
   font-size: .92rem; font-weight: 600; color: var(--c-text);
   letter-spacing: -.01em;
 }
-.cv-timeline li.is-active .dot {
-  background: var(--c-accent); border-color: var(--c-accent);
-  transform: scale(1.15);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--c-accent) 25%, transparent);
-}
-.cv-timeline li.is-active { background: var(--c-bg-alt); }
-.cv-timeline li.is-active .period { color: var(--c-accent); }
 
 /* --- Center stage --- */
 .cv-stage {
@@ -500,31 +527,29 @@ html[data-resolved="dark"] .cv-bg-layer.is-active { opacity: 0.28; }
   gap: clamp(64px, 10vw, 120px);
 }
 .cv-cue {
+  --p: 0; /* per-item progress 0..1 — written by main.js */
   display: flex; flex-direction: column; align-items: center;
   gap: 8px;
   padding-top: clamp(28px, 4vw, 44px); /* align with scene padding */
   text-align: center;
-  opacity: 0.55;
-  transition: opacity var(--t-med);
+  opacity: calc(0.55 + var(--p) * 0.45);
+  transition: opacity 120ms linear;
 }
-.cv-cue.is-active { opacity: 1; }
 .cv-cue-frame {
   width: 56px; height: 56px;
   border-radius: 50%;
   background: var(--c-surface);
-  border: 1px solid var(--c-line);
+  border: 1px solid color-mix(in oklab,
+                              var(--c-accent) calc(var(--p) * 60%),
+                              var(--c-line));
   display: inline-flex; align-items: center; justify-content: center;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: border-color var(--t-fast), transform var(--t-fast),
-              box-shadow var(--t-fast);
-}
-.cv-cue.is-active .cv-cue-frame {
-  border-color: color-mix(in oklab, var(--c-accent) 60%, var(--c-line));
-  transform: scale(1.05);
+  transform: scale(calc(1 + var(--p) * 0.05));
   box-shadow:
-    0 0 0 4px color-mix(in oklab, var(--c-accent) 18%, transparent),
+    0 0 0 calc(var(--p) * 4px) color-mix(in oklab, var(--c-accent) 18%, transparent),
     var(--shadow-sm);
+  transition: transform 120ms linear, border-color 120ms linear,
+              box-shadow 120ms linear;
 }
 .cv-cue-frame img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
 .cv-cue-monogram {
@@ -621,6 +646,11 @@ html[data-resolved="dark"] .cv-cue-monogram { color: var(--c-blueprint); }
   .reveal, .reveal-children > *, .cv-scene { opacity: 1 !important; transform: none !important; }
   .cv-bg-layer { transition: none !important; }
   .cv-cue { opacity: 1 !important; }
+  .cv-timeline::after,
+  .cv-timeline li,
+  .cv-timeline li .dot,
+  .cv-timeline li .period,
+  .cv-cue-frame { transition: none !important; }
 }
 
 /* ---------- Scroll-driven enhancement (Chromium) ----------
@@ -647,4 +677,78 @@ html[data-resolved="dark"] .cv-cue-monogram { color: var(--c-blueprint); }
   outline: 2px solid var(--c-accent);
   outline-offset: 3px;
   border-radius: 6px;
+}
+
+/* ---------- Legal pages (Impressum, Datenschutz) ---------- */
+.page.legal { padding-bottom: clamp(56px, 7vw, 96px); }
+.page.legal .small { font-size: .85rem; }
+
+.legal-prose h2 {
+  margin-top: 2.4em;
+  padding-bottom: .35em;
+  border-bottom: 1px solid var(--c-line);
+  font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+  letter-spacing: -.015em;
+}
+.legal-prose h2:first-child { margin-top: 0; }
+.legal-prose h3 {
+  margin-top: 1.8em;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--c-text-muted);
+  font-weight: 600;
+}
+.legal-prose h4 {
+  margin-top: 1.4em;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--c-text);
+}
+.legal-prose address {
+  font-style: normal;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-left: 3px solid var(--c-accent);
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  margin: 0 0 1.2em;
+  line-height: 1.7;
+  font-variant-numeric: tabular-nums;
+}
+.legal-prose .legal-contact {
+  list-style: none; padding: 0; margin: 0 0 1.4em;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.legal-prose .legal-contact strong {
+  display: inline-block; min-width: 5.5em; color: var(--c-text-muted);
+  font-weight: 600;
+}
+.legal-prose hr {
+  margin: 3em 0;
+  border: 0;
+  border-top: 1px dashed var(--c-line);
+}
+.legal-prose .legal-lang { scroll-margin-top: 100px; }
+.legal-prose section[lang] { margin-top: 0; }
+.legal-prose .back { margin-top: 3em; padding-top: 1.4em; border-top: 1px solid var(--c-line); }
+
+/* ---------- Footer legal nav ---------- */
+.footer-links { flex: 1 1 auto; min-width: 0; }
+.legal-nav {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-wrap: wrap; gap: 14px;
+  justify-content: center;
+}
+.legal-nav a {
+  color: var(--c-text-muted); font-size: .92rem;
+  border-bottom: 1px dotted transparent;
+  padding-bottom: 1px;
+  transition: color var(--t-fast), border-color var(--t-fast);
+}
+.legal-nav a:hover { color: var(--c-accent); border-bottom-color: currentColor; }
+
+@media (max-width: 720px) {
+  .footer-inner { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .legal-nav { justify-content: flex-start; }
 }

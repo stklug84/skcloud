@@ -80,6 +80,23 @@ social:
   linkedin: ""
   email: ""
 
+# Legal / Impressum information (edit these — required for the
+# Impressum & Datenschutz pages to be legally valid in Germany/EU).
+# The page falls back to "TODO …" placeholders when a value is empty,
+# so it's obvious what still needs to be filled in.
+# legal:
+#   name: "Steffen Klug"
+#   street: ""
+#   postal_code: ""
+#   city: ""
+#   country: "Germany"
+#   email: ""
+#   phone: ""
+#   # Person responsible for content per § 18 Abs. 2 MStV
+#   # (defaults to `name` if left blank).
+#   content_responsible: ""
+#   last_updated: "2026-05-08" # ISO date — bump when you change the page
+
 exclude:
   - Gemfile
   - Gemfile.lock

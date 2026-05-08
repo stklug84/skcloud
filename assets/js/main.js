@@ -157,49 +157,96 @@
       cvScenes.forEach(function (s) { s.classList.add('is-visible'); });
     }
 
-    // Active-state tracking — drives left timeline, right rail, and bg.
-    if ('IntersectionObserver' in window) {
-      var setActive = function (id) {
-        cvNav.forEach(function (li) {
-          li.classList.toggle('is-active', li.getAttribute('data-target') === id);
-        });
-        cvCues.forEach(function (li) {
-          li.classList.toggle('is-active', li.getAttribute('data-target') === id);
-        });
-        var scene = document.getElementById(id);
-        if (scene) {
-          var url = scene.getAttribute('data-bg');
-          setSceneBg(url);
+    // Reading-line continuous progress model.
+    // For each scene compute progress = clamp01((readingY - top) / height).
+    // Drives: per-item --p, --cv-rail-fill, --cv-bg-opacity (bell curve),
+    //         and the discrete .is-active marker + bg image swap.
+    var cvRoot = document.querySelector('.cv-scroll');
+    var READING_LINE_RATIO = 0.40;
+    var lastActiveIndex = -1;
+    var ticking = false;
+
+    function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+
+    function compute() {
+      ticking = false;
+      if (!cvRoot || !cvScenes.length) return;
+      var readingY = window.innerHeight * READING_LINE_RATIO;
+
+      // Phase 1 — reads only.
+      var progress = new Array(cvScenes.length);
+      for (var i = 0; i < cvScenes.length; i++) {
+        var r = cvScenes[i].getBoundingClientRect();
+        var h = r.bottom - r.top;
+        progress[i] = h > 0 ? clamp01((readingY - r.top) / h) : 0;
+      }
+
+      // Active = last scene with progress > 0; clamp at last when all done.
+      var activeIndex = 0;
+      var allZero = true, allOne = true;
+      for (var j = 0; j < progress.length; j++) {
+        if (progress[j] > 0) allZero = false;
+        if (progress[j] < 1) allOne = false;
+        if (progress[j] > 0 && progress[j] <= 1) activeIndex = j;
+      }
+      if (allZero) activeIndex = 0;
+      if (allOne) activeIndex = progress.length - 1;
+
+      var activeProgress = progress[activeIndex];
+      var railFill = (activeIndex + activeProgress) / progress.length;
+      var bgOpacity = Math.sin(activeProgress * Math.PI); // 0..1..0
+
+      // Phase 2 — writes.
+      cvRoot.style.setProperty('--cv-rail-fill', railFill.toFixed(4));
+      cvRoot.style.setProperty('--cv-active-index', activeIndex);
+      cvRoot.style.setProperty('--cv-active-progress', activeProgress.toFixed(4));
+      cvRoot.style.setProperty('--cv-bg-opacity', bgOpacity.toFixed(4));
+
+      for (var k = 0; k < progress.length; k++) {
+        var pStr = progress[k].toFixed(4);
+        if (cvNav[k]) cvNav[k].style.setProperty('--p', pStr);
+        if (cvCues[k]) cvCues[k].style.setProperty('--p', pStr);
+      }
+
+      // Discrete marker + bg image swap on activeIndex change.
+      if (activeIndex !== lastActiveIndex) {
+        for (var m = 0; m < cvNav.length; m++) {
+          var on = (m === activeIndex);
+          cvNav[m].classList.toggle('is-active', on);
+          if (on) cvNav[m].setAttribute('aria-current', 'true');
+          else cvNav[m].removeAttribute('aria-current');
         }
-      };
-      var activeIO = new IntersectionObserver(function (entries) {
-        var visible = entries.filter(function (e) { return e.isIntersecting; });
-        if (!visible.length) return;
-        visible.sort(function (a, b) {
-          return Math.abs(a.boundingClientRect.top) - Math.abs(b.boundingClientRect.top);
-        });
-        setActive(visible[0].target.id);
-      }, { rootMargin: '-30% 0px -55% 0px', threshold: [0, 0.25, 0.6, 1] });
-      cvScenes.forEach(function (s) { activeIO.observe(s); });
-
-      // initialize first as active
-      setActive(cvScenes[0].id);
-
-      // click to scroll — left timeline
-      cvNav.forEach(function (li) {
-        li.addEventListener('click', function () {
-          var id = li.getAttribute('data-target');
-          var target = document.getElementById(id);
-          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-        li.setAttribute('role', 'button');
-        li.setAttribute('tabindex', '0');
-        li.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault(); li.click();
-          }
-        });
-      });
+        for (var n = 0; n < cvCues.length; n++) {
+          cvCues[n].classList.toggle('is-active', n === activeIndex);
+        }
+        var url = cvScenes[activeIndex].getAttribute('data-bg');
+        setSceneBg(url);
+        lastActiveIndex = activeIndex;
+      }
     }
+
+    function onScroll() {
+      if (!ticking) { ticking = true; requestAnimationFrame(compute); }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    compute();
+
+    // Click-to-scroll on left timeline (kept).
+    cvNav.forEach(function (li) {
+      li.addEventListener('click', function () {
+        var id = li.getAttribute('data-target');
+        var target = document.getElementById(id);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      li.setAttribute('role', 'button');
+      li.setAttribute('tabindex', '0');
+      li.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault(); li.click();
+        }
+      });
+    });
   }
 })();
