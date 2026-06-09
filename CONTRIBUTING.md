@@ -5,8 +5,8 @@ propose changes — whether you're fixing a typo, adding a blog post, or
 shipping a new section.
 
 This is a small personal site, but the workflow is set up so that anyone
-can submit a clean PR and have it previewed automatically on the canary
-URL before it goes live.
+can submit a clean PR and have it previewed automatically on a per-commit
+preview URL before it goes live.
 
 ---
 
@@ -51,23 +51,22 @@ URL before it goes live.
 | Branch     | Purpose                                                 |
 | ---------- | ------------------------------------------------------- |
 | `main`     | Production. Always deployable. Protected.               |
-| `develop`  | Canary preview. Auto-deployed to `/canary/`.            |
-| `feat/*`   | Short-lived feature branches off `develop`.             |
-| `fix/*`    | Short-lived bug-fix branches off `develop` or `main`.   |
+| `feat/*`   | Short-lived feature branches off `main`.                |
+| `fix/*`    | Short-lived bug-fix branches off `main`.                |
 | `content/*`| Content-only changes (posts, CV updates, etc.).         |
 
 **Typical flow**
 
 ```text
-   feat/dark-mode-tweaks  ── PR ──▶  develop  ── PR ──▶  main
-                                      │
-                                      └── auto-deploys to /canary/
+   feat/dark-mode-tweaks  ── push ──▶  per-commit preview at
+                                       blutoniumstrom.com/<short-sha>/
+                          ── PR ────▶  main  ──▶  production
 ```
 
-For **content-only changes** you can branch directly off `main` and PR
-straight into `main`. For **anything that touches layouts, CSS, JS, or
-the workflow files**, use `develop` so the change gets a canary preview
-first.
+Branch off `main`, push, and open a PR into `main`. Every push (on any
+branch) automatically builds a **per-commit preview** published to
+`https://blutoniumstrom.com/<short-sha>/`; the URL is posted as a sticky
+comment on the PR.
 
 ---
 
@@ -116,15 +115,16 @@ bundle exec jekyll serve --livereload
 Useful flags:
 
 ```bash
-bundle exec jekyll serve --drafts            # include _drafts/
-bundle exec jekyll serve --baseurl "/canary" # simulate the canary build
-bundle exec jekyll build  --trace            # full backtrace on errors
-bundle exec jekyll doctor                    # config sanity check
+bundle exec jekyll serve --drafts              # include _drafts/
+bundle exec jekyll serve --baseurl "/<sha>"    # simulate a per-commit preview
+bundle exec jekyll build  --trace              # full backtrace on errors
+bundle exec jekyll doctor                      # config sanity check
 ```
 
-When you push a branch to GitHub, the canary workflow only runs on
-`develop`. To get a canary URL for a feature branch, merge it into
-`develop` first.
+When you push a branch to GitHub, the per-commit preview workflow runs on
+**every** branch and publishes the build to
+`https://blutoniumstrom.com/<short-sha>/`. Open a PR into `main` to get the
+preview URL posted as a sticky comment.
 
 ---
 
@@ -306,8 +306,8 @@ scope.
   ````
 - Use blockquotes (`>`) for callouts.
 - Link with `[text](url)` for external links; use
-  `{{ '/path' | relative_url }}` for internal links so the canary build
-  still works.
+  `{{ '/path' | relative_url }}` for internal links so the per-commit
+  preview build still works.
 
 ### YAML front-matter
 
@@ -323,7 +323,7 @@ scope.
   <a href="{{ '/blog/' | relative_url }}">Blog</a>
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
   ```
-  Hard-coded `/...` paths break the canary build.
+  Hard-coded `/...` paths break the per-commit preview build.
 - Indent with 2 spaces.
 - Prefer semantic tags (`<article>`, `<nav>`, `<section>`, `<header>`,
   `<footer>`) over generic `<div>`.
@@ -354,7 +354,7 @@ Use a short, imperative subject line, optionally with a scope:
 content(blog): add post on AKS Automatic
 style(cv): tighten timeline spacing on mobile
 fix(nav): close mobile menu on Esc
-docs: clarify canary deployment in README
+docs: clarify preview deployment in README
 chore(deps): bump github-pages to latest
 ```
 
@@ -373,10 +373,11 @@ Before opening a PR:
 2. **Test light + dark.** Click the theme toggle in the header and
    verify your change looks good in both. Resize the browser narrow
    (≤ 760 px) to check the mobile layout.
-3. **Test the canary baseurl.** If you changed any links, run:
+3. **Test a preview baseurl.** If you changed any links, run (use any
+   placeholder for `<sha>`):
    ```bash
-   bundle exec jekyll serve --baseurl "/canary"
-   # then visit http://localhost:4000/canary/
+   bundle exec jekyll serve --baseurl "/<sha>"
+   # then visit http://localhost:4000/<sha>/
    ```
    All internal links should still work.
 4. **Run jekyll doctor:**
@@ -399,8 +400,7 @@ CI runs the same build with Ruby 3.3 — if your local build passes on
 When opening a PR, please tick these boxes (or call out why one
 doesn't apply):
 
-- [ ] PR targets `develop` (for code/style/layout) **or** `main` (for
-      content-only).
+- [ ] PR targets `main`.
 - [ ] One topic per PR.
 - [ ] `bundle exec jekyll build` succeeds locally.
 - [ ] Tested in **both** light and dark theme.
@@ -411,9 +411,9 @@ doesn't apply):
 - [ ] No secrets or private info committed.
 - [ ] Commit messages follow the [style guide](#commit-messages).
 
-After your PR is merged into `develop`, you can preview the change at
-`https://steffenklug.cloud/canary/`. A second PR from `develop` → `main`
-promotes it to production.
+While your PR is open, a per-commit preview of the change is published to
+`https://blutoniumstrom.com/<short-sha>/` and linked in a sticky PR comment.
+Merging the PR into `main` promotes it to production.
 
 ---
 

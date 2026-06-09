@@ -1,0 +1,25 @@
+# PR preview comment.
+#
+# The sticky-comment logic lives in the central reusable workflow:
+#   stklug84/github-workflows/.github/workflows/misc-pr-preview-comment.yml
+# This caller owns the trigger, permissions, and concurrency.
+name: PR preview comment
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-preview-comment-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  comment:
+    uses: stklug84/github-workflows/.github/workflows/misc-pr-preview-comment.yml@v1.2.1
+    with:
+      preview-domain: https://blutoniumstrom.com
