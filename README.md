@@ -123,7 +123,8 @@ obvious what still needs filling in.
 ```
 .
 ├── _config.yml                # Jekyll site config (collections, nav, plugins)
-├── Gemfile                    # Ruby gems (Jekyll, github-pages)
+├── Gemfile                    # Ruby gems (Jekyll 4 + plugins)
+├── .ruby-version              # Pinned Ruby (4.0.5) for local + CI
 ├── CNAME                      # Custom domain for GitHub Pages
 │
 ├── _layouts/                  # Page templates
@@ -482,11 +483,11 @@ git push -u origin feat/my-change   # triggers a per-commit preview
 
 ### Local development
 
-You'll need a recent Ruby (the CI uses **Ruby 3.3**) and Bundler.
+You'll need **Ruby 4.0.5** (pinned in `.ruby-version` and used by CI) and Bundler.
 
 ```bash
 # from repo root
-bundle install                   # installs Jekyll, github-pages, etc.
+bundle install                   # installs Jekyll 4 + plugins
 bundle exec jekyll serve         # http://localhost:4000  (live reload)
 # or just build:
 bundle exec jekyll build         # outputs to ./_site
@@ -501,40 +502,45 @@ bundle exec jekyll serve --baseurl "/<short-sha>"
 
 #### Pinned versions
 
-The `Gemfile` pins **`github-pages ~> 232`**, which transitively gives:
+The `Gemfile` uses **standalone Jekyll 4** (not the `github-pages` metagem,
+which is locked to `commonmarker 0.23.x` and cannot run on Ruby 4). The site
+is built with Bundler in CI and the artifact is deployed, so GitHub's
+server-side Jekyll is not used.
 
-| Gem            | Version  | Why it matters                                      |
-| -------------- | -------- | --------------------------------------------------- |
-| `jekyll`       | 3.10.0   | Matches what GitHub Pages currently runs            |
-| `liquid`       | 4.0.4    | **Required.** `4.0.3` calls `String#tainted?` which Ruby 3.2+ removed — builds break on Ruby 3.3 runners |
-| `kramdown`     | 2.4.0    | Markdown engine                                     |
-| `rouge`        | 3.30.0   | Syntax highlighter                                  |
+| Gem               | Version | Why it matters                           |
+| ----------------- | ------- | ---------------------------------------- |
+| `jekyll`          | 4.4.x   | Site generator (Ruby 4 compatible)       |
+| `jekyll-feed`     | 0.17.x  | Atom feed                                |
+| `jekyll-seo-tag`  | 2.9.x   | SEO/meta tags                            |
+| `jekyll-sitemap`  | 1.4.x   | sitemap.xml                              |
+| `kramdown`        | 2.5.x   | Markdown engine                          |
+| `liquid`          | 4.0.x   | Template engine                          |
 
-> **Don't downgrade `github-pages` below 232.** v223 hard-pinned
-> `liquid = 4.0.3` and breaks on the Ruby 3.3.x that GitHub Actions ships.
-
-The `Gemfile` also adds back `csv`, `bigdecimal`, `logger`, and `base64`,
+The `Gemfile` also adds `csv`, `bigdecimal`, `logger`, and `base64`,
 which Ruby 3.4+ moved out of the default stdlib but Jekyll still requires.
-These are harmless on Ruby 3.3.
+On Ruby 4.x they are mandatory.
 
-#### Ruby 4 note
+#### Ruby version
 
-If you're on a system where the default Ruby is 4.0+ (some macOS Homebrew
-setups symlink `ruby@3.3` to Ruby 4), gem resolution will fail because
-`commonmarker` doesn't support Ruby 4 yet. **CI is unaffected** because
-the workflow pins Ruby 3.3.11. To preview locally, use a real Ruby 3.3 via
-`mise`/`rbenv`/`asdf`, or use Docker:
+This project targets **Ruby 4.0.5** (see `.ruby-version`). Use a matching
+local Ruby via `mise`/`rbenv`/`asdf`, then:
 
 ```bash
-# Resolve gems and run a build in a Ruby 3.3 container
-docker run --rm -v "$PWD:/work" -w /work ruby:3.3.11-slim bash -c "
+bundle install
+bundle exec jekyll serve --host 0.0.0.0
+# Then open http://localhost:4000
+```
+
+If `bundle install` fails locally because a native extension needs a C
+toolchain, make sure build tools are installed, or build in a container:
+
+```bash
+docker run --rm -v "$PWD:/work" -w /work ruby:4.0.5-slim bash -c "
   apt-get update -qq && apt-get install -y -qq build-essential git >/dev/null
   gem install bundler --no-document
   bundle install
   bundle exec jekyll serve --host 0.0.0.0
 "
-
-# Then open http://localhost:4000
 ```
 
 ### Useful commands

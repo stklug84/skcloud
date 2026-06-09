@@ -74,9 +74,9 @@ comment on the PR.
 
 You'll need:
 
-- **Ruby 3.3** (the version pinned by CI).
-  Newer Rubies *may* work — see the Ruby 3.4 / Ruby 4 notes in the
-  [README](./README.md#local-development) — but 3.3 is the supported version.
+- **Ruby 4.0.5** (pinned in `.ruby-version` and used by CI).
+  Use `mise`/`rbenv`/`asdf` to match it — see the
+  [README](./README.md#ruby-version).
 - **Bundler** (`gem install bundler`).
 - **Git**.
 
@@ -86,11 +86,10 @@ cd skcloud
 bundle install
 ```
 
-If you don't have a system Ruby 3.3 (or you're on macOS Homebrew where
-`ruby@3.3` is currently symlinked to Ruby 4), use Docker:
+If you don't have a system Ruby 4.0.5, use Docker:
 
 ```bash
-docker run --rm -it -p 4000:4000 -v "$PWD:/work" -w /work ruby:3.3.11-slim bash -c "
+docker run --rm -it -p 4000:4000 -v "$PWD:/work" -w /work ruby:4.0.5-slim bash -c "
   apt-get update -qq && apt-get install -y -qq build-essential git >/dev/null
   gem install bundler --no-document
   bundle install
@@ -98,9 +97,9 @@ docker run --rm -it -p 4000:4000 -v "$PWD:/work" -w /work ruby:3.3.11-slim bash 
 "
 ```
 
-> **Why not the official `jekyll/jekyll` image?** It ships Jekyll 3.9 +
-> liquid 4.0.3, which has a `String#tainted?` call that breaks on modern
-> Ruby. We pin `github-pages ~> 232` to avoid this — see the README's
+> **Why the `ruby:4.0.5-slim` image?** It matches `.ruby-version`. We use
+> standalone **Jekyll 4** (not the `github-pages` metagem, which is locked to
+> `commonmarker 0.23.x` and can't run on Ruby 4) — see the README's
 > [pinned versions](./README.md#pinned-versions) section.
 
 ---
@@ -355,7 +354,7 @@ content(blog): add post on AKS Automatic
 style(cv): tighten timeline spacing on mobile
 fix(nav): close mobile menu on Esc
 docs: clarify preview deployment in README
-chore(deps): bump github-pages to latest
+chore(deps): bump jekyll to latest
 ```
 
 Common scopes: `blog`, `cv`, `projects`, `architectures`, `books`,
@@ -390,8 +389,8 @@ Before opening a PR:
    # check ./_site/ for the expected files
    ```
 
-CI runs the same build with Ruby 3.3 — if your local build passes on
-3.3, CI will almost always pass too.
+CI runs the same build with Ruby 4.0.5 — if your local build passes on
+4.0.5, CI will almost always pass too.
 
 ---
 
