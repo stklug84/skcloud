@@ -1,0 +1,30 @@
+---
+layout: default
+title: Blog
+permalink: /blog/
+description: Notes from the field on cloud architecture, platforms, and developer experience.
+---
+
+<section class="page container narrow">
+  <header class="page-header">
+    <p class="eyebrow">Blog</p>
+    <h1>Notes from the field.</h1>
+    <p class="lede">Thoughts, patterns, and lessons from designing and running cloud platforms.</p>
+  </header>
+
+  {% if site.posts.size == 0 %}
+    <p class="muted">No posts yet — check back soon.</p>
+  {% else %}
+    <ul class="post-list reveal-children">
+      {% for post in site.posts %}
+        <li>
+          <a class="post-row" href="{{ post.url | relative_url }}">
+            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time>
+            <span class="post-title">{{ post.title }}</span>
+            {% if post.subtitle %}<span class="post-sub muted">{{ post.subtitle }}</span>{% endif %}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</section>

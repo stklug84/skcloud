@@ -1,0 +1,121 @@
+---
+layout: default
+title: CV
+permalink: /cv/
+description: A scrollable CV — career, skills, and certifications.
+---
+
+{% assign cv = site.data.cv %}
+
+<section class="cv">
+  <div class="container">
+    <header class="page-header narrow cv-intro">
+      <p class="eyebrow">CV</p>
+      <h1>{{ cv.name }} <span class="muted">— {{ cv.title }}</span></h1>
+      <p class="lede">{{ cv.summary }}</p>
+    </header>
+  </div>
+
+  <div class="cv-scroll container" data-cv-root>
+
+    {%- comment -%} Phasing background canvas — two layers cross-fade. {%- endcomment -%}
+    <div class="cv-bg" aria-hidden="true">
+      <div class="cv-bg-layer is-active" data-cv-bg="a"></div>
+      <div class="cv-bg-layer" data-cv-bg="b"></div>
+      <div class="cv-bg-vignette"></div>
+    </div>
+
+    {%- comment -%} Left rail: dates + active dot timeline (sticky). {%- endcomment -%}
+    <aside class="cv-rail cv-rail-left" aria-label="Career timeline">
+      <div class="cv-sticky">
+        <p class="eyebrow">Career</p>
+        <ol class="cv-timeline">
+          {% for r in cv.roles %}
+            <li data-target="role-{{ forloop.index }}">
+              <span class="dot" aria-hidden="true"></span>
+              <span class="period tabular">{{ r.period }}</span>
+              <span class="role-mini">{{ r.role }}</span>
+            </li>
+          {% endfor %}
+        </ol>
+      </div>
+    </aside>
+
+    {%- comment -%} Center: scenes. {%- endcomment -%}
+    <div class="cv-stage">
+      {% for r in cv.roles %}
+        {%- assign idx = forloop.index -%}
+        <article
+          class="cv-scene"
+          id="role-{{ idx }}"
+          data-index="{{ idx }}"
+          {% if r.bg %}data-bg="{{ r.bg | relative_url }}"{% endif %}
+        >
+          <p class="eyebrow tabular">{{ r.period }} · {{ r.org }}</p>
+          <h2>{{ r.role }}</h2>
+          <p class="muted">{{ r.location }}</p>
+          <p class="lede">{{ r.summary }}</p>
+          {% if r.bullets %}
+            <ul class="bullets">
+              {% for b in r.bullets %}<li>{{ b }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+          {% if r.tags %}
+            <ul class="tags">
+              {% for t in r.tags %}<li>{{ t }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+
+    {%- comment -%} Right rail: per-scene crest / monogram (sticky-stack). {%- endcomment -%}
+    <aside class="cv-rail cv-rail-right" aria-hidden="true">
+      <ol class="cv-cues">
+        {% for r in cv.roles %}
+          <li class="cv-cue" data-target="role-{{ forloop.index }}" data-kind="{{ r.kind | default: 'work' }}">
+            <div class="cv-cue-frame">
+              {% if r.logo %}
+                <img src="{{ r.logo | relative_url }}" alt="" loading="lazy" decoding="async">
+              {% else %}
+                <span class="cv-cue-monogram">{{ r.monogram | default: r.org | slice: 0, 2 | upcase }}</span>
+              {% endif %}
+            </div>
+            <span class="cv-cue-org">{{ r.org }}</span>
+          </li>
+        {% endfor %}
+      </ol>
+    </aside>
+  </div>
+
+  <div class="container narrow">
+    <section class="cv-extra reveal-children">
+      <header class="section-head">
+        <p class="eyebrow">Skills</p>
+        <h2>What I work with.</h2>
+      </header>
+      <ul class="skill-groups">
+        {% for g in cv.skills %}
+          <li>
+            <h3>{{ g.group }}</h3>
+            <ul class="tags">
+              {% for s in g.items %}<li>{{ s }}</li>{% endfor %}
+            </ul>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    {% if cv.certifications and cv.certifications.size > 0 %}
+      <section class="cv-extra reveal-children">
+        <header class="section-head">
+          <p class="eyebrow">Certifications</p>
+          <h2>Verified credentials.</h2>
+        </header>
+        <ul class="cert-list">
+          {% for c in cv.certifications %}<li>{{ c }}</li>{% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+  </div>
+</section>

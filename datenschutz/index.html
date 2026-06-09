@@ -1,0 +1,279 @@
+---
+layout: default
+title: Datenschutzerklärung
+permalink: /datenschutz/
+description: Privacy policy according to GDPR / DSGVO for this static site.
+sitemap: false
+---
+
+{% assign L = site.legal %}
+{% assign name      = L.name      | default: "TODO Vor- und Nachname" %}
+{% assign street    = L.street    | default: "TODO Straße und Hausnummer" %}
+{% assign zip       = L.postal_code | default: "TODO PLZ" %}
+{% assign city      = L.city      | default: "TODO Stadt" %}
+{% assign country   = L.country   | default: "Deutschland" %}
+{% assign email     = L.email     | default: "TODO@example.com" %}
+{% assign updated   = L.last_updated | default: "2026-05-08" %}
+
+<article class="page legal container narrow">
+  <header class="page-header">
+    <p class="eyebrow">Legal · Rechtliches</p>
+    <h1>Datenschutzerklärung</h1>
+    <p class="lede">
+      Hinweise zur Verarbeitung personenbezogener Daten nach Art. 13
+      Datenschutz-Grundverordnung (DSGVO).
+    </p>
+    <p class="muted small">
+      Letzte Aktualisierung / Last updated:
+      <time datetime="{{ updated }}">{{ updated | date: "%-d. %B %Y" }}</time>
+    </p>
+  </header>
+  <div class="prose legal-prose">
+
+    <!-- =================================================================
+         DEUTSCH (rechtsverbindliche Fassung)
+         ================================================================= -->
+    <section lang="de" class="legal-lang">
+      <h2>Deutsch <span class="muted small">(rechtsverbindliche Fassung)</span></h2>
+
+      <h3>1. Verantwortlicher</h3>
+      <p>
+        Verantwortlicher im Sinne der DSGVO und anderer nationaler
+        Datenschutzgesetze sowie sonstiger datenschutzrechtlicher
+        Bestimmungen ist:
+      </p>
+      <address>
+        {{ name }}<br>
+        {{ street }}<br>
+        {{ zip }} {{ city }}<br>
+        {{ country }}<br>
+        E-Mail:
+        {% if L.email and L.email != "" %}<a href="mailto:{{ email }}">{{ email }}</a>{% else %}<span class="muted">{{ email }}</span>{% endif %}
+      </address>
+
+      <h3>2. Hosting (GitHub Pages)</h3>
+      <p>
+        Diese Website wird statisch gehostet bei
+        <strong>GitHub Pages</strong>, einem Dienst der
+        GitHub, Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107,
+        USA, sowie ihrer Tochtergesellschaft GitHub B.V., Vijzelstraat 68,
+        1017 HL Amsterdam, Niederlande.
+      </p>
+      <p>
+        Beim Aufruf dieser Website verarbeitet GitHub aus technischen
+        Gründen automatisch bestimmte Informationen, die Ihr Browser
+        übermittelt (sog. Server-Logfiles). Hierzu zählen typischerweise:
+      </p>
+      <ul>
+        <li>IP-Adresse des anfragenden Geräts</li>
+        <li>Datum und Uhrzeit der Anfrage</li>
+        <li>aufgerufene Ressource (z. B. Pfad und Datei)</li>
+        <li>HTTP-Statuscode und übertragene Datenmenge</li>
+        <li>Referrer-URL (zuvor besuchte Seite)</li>
+        <li>User-Agent (Browser- und Betriebssystem-Kennung)</li>
+      </ul>
+      <p>
+        Die Verarbeitung erfolgt zur Wahrung berechtigter Interessen an
+        einer technisch fehlerfreien und sicheren Bereitstellung der
+        Website (Art. 6 Abs. 1 lit. f DSGVO). Da der Dienst in den USA
+        betrieben wird, kann eine Übermittlung in ein Drittland
+        stattfinden. GitHub ist nach dem
+        <a href="https://www.dataprivacyframework.gov/list" rel="noopener external">EU-US Data Privacy Framework</a>
+        zertifiziert; zusätzlich kommen Standardvertragsklauseln zur
+        Anwendung.
+      </p>
+      <p>
+        Weitere Informationen finden Sie in der Datenschutzerklärung von
+        GitHub:
+        <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement"
+           rel="noopener external">GitHub General Privacy Statement</a>.
+      </p>
+
+      <h3>3. Was diese Website <em>nicht</em> tut</h3>
+      <ul>
+        <li>Es werden <strong>keine Cookies</strong> gesetzt.</li>
+        <li>Es findet <strong>kein Tracking</strong> und keine Analyse
+          des Nutzerverhaltens statt (kein Google Analytics, kein
+          Plausible, kein Matomo o. Ä.).</li>
+        <li>Es werden <strong>keine externen Schriften, Skripte oder
+          Werbedienste</strong> nachgeladen.</li>
+        <li>Es gibt <strong>keine Kontaktformulare</strong> und keine
+          Kommentar­funktion auf dieser Seite.</li>
+        <li>Es werden <strong>keine personen­bezogenen Daten an Dritte
+          weitergegeben</strong>, außer im Rahmen des oben genannten
+          Hostings durch GitHub.</li>
+      </ul>
+      <p>
+        Lediglich eine technische Einstellung wird im
+        <em>localStorage</em> Ihres Browsers gespeichert: die von Ihnen
+        gewählte Farbtheme-Präferenz (hell / dunkel / automatisch).
+        Diese Information verlässt Ihren Browser nicht und wird nicht
+        an einen Server übermittelt.
+      </p>
+
+      <h3>4. Externe Links</h3>
+      <p>
+        Diese Website enthält Links zu externen Diensten Dritter
+        (z. B. GitHub, LinkedIn). Beim Klick auf einen solchen Link
+        verlassen Sie diese Website. Die Datenverarbeitung auf den
+        verlinkten Seiten unterliegt der Verantwortung der jeweiligen
+        Anbieter und ist in deren Datenschutz­erklärungen geregelt.
+      </p>
+
+      <h3>5. Ihre Rechte</h3>
+      <p>
+        Ihnen stehen nach der DSGVO folgende Rechte zu, soweit die
+        gesetzlichen Voraussetzungen vorliegen:
+      </p>
+      <ul>
+        <li><strong>Auskunft</strong> über die Sie betreffenden
+          personenbezogenen Daten (Art. 15 DSGVO)</li>
+        <li><strong>Berichtigung</strong> unrichtiger Daten
+          (Art. 16 DSGVO)</li>
+        <li><strong>Löschung</strong> Ihrer Daten („Recht auf
+          Vergessenwerden", Art. 17 DSGVO)</li>
+        <li><strong>Einschränkung der Verarbeitung</strong>
+          (Art. 18 DSGVO)</li>
+        <li><strong>Widerspruch</strong> gegen die Verarbeitung
+          (Art. 21 DSGVO)</li>
+        <li><strong>Datenübertragbarkeit</strong> (Art. 20 DSGVO)</li>
+        <li><strong>Beschwerde bei einer Aufsichtsbehörde</strong>
+          (Art. 77 DSGVO), z. B. der für Ihren Wohnsitz zuständigen
+          Landes­datenschutzbehörde</li>
+      </ul>
+      <p>
+        Zur Ausübung dieser Rechte genügt eine formlose Mitteilung an
+        die oben angegebene E-Mail-Adresse.
+      </p>
+
+      <h3>6. Aktualität dieser Erklärung</h3>
+      <p>
+        Diese Datenschutzerklärung ist aktuell gültig. Durch
+        Weiterentwicklung der Website oder geänderte gesetzliche
+        Anforderungen kann eine Anpassung erforderlich werden. Die
+        jeweils aktuelle Fassung ist stets unter dieser URL abrufbar.
+      </p>
+    </section>
+
+    <hr>
+
+    <!-- =================================================================
+         ENGLISH (translation, non-binding)
+         ================================================================= -->
+    <section lang="en" class="legal-lang">
+      <h2>English <span class="muted small">(translation, non-binding)</span></h2>
+
+      <p class="muted">
+        The German version above is the legally binding text under
+        German and EU law. This English translation is provided for
+        convenience.
+      </p>
+
+      <h3>1. Data controller</h3>
+      <p>
+        The controller within the meaning of the GDPR and other
+        national data protection laws is:
+      </p>
+      <address>
+        {{ name }}<br>
+        {{ street }}<br>
+        {{ zip }} {{ city }}<br>
+        {{ country }}<br>
+        Email:
+        {% if L.email and L.email != "" %}<a href="mailto:{{ email }}">{{ email }}</a>{% else %}<span class="muted">{{ email }}</span>{% endif %}
+      </address>
+
+      <h3>2. Hosting (GitHub Pages)</h3>
+      <p>
+        This website is statically hosted on
+        <strong>GitHub Pages</strong>, a service provided by
+        GitHub, Inc. (88 Colin P Kelly Jr St, San Francisco, CA 94107,
+        USA) and its subsidiary GitHub B.V. (Vijzelstraat 68,
+        1017 HL Amsterdam, Netherlands).
+      </p>
+      <p>
+        For technical reasons, GitHub automatically processes certain
+        information transmitted by your browser when you access this
+        site (server log files), typically including:
+      </p>
+      <ul>
+        <li>IP address of the requesting device</li>
+        <li>Date and time of the request</li>
+        <li>Requested resource (path and file)</li>
+        <li>HTTP status code and amount of data transferred</li>
+        <li>Referrer URL</li>
+        <li>User agent string (browser and OS identifier)</li>
+      </ul>
+      <p>
+        Processing is based on the legitimate interest in providing a
+        technically functional and secure website (Art. 6 (1) lit. f
+        GDPR). Because the service is operated in the USA, transfer to
+        a third country may occur. GitHub is certified under the
+        <a href="https://www.dataprivacyframework.gov/list" rel="noopener external">EU-US Data Privacy Framework</a>;
+        Standard Contractual Clauses additionally apply.
+      </p>
+      <p>
+        Further information can be found in
+        <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement"
+           rel="noopener external">GitHub's General Privacy Statement</a>.
+      </p>
+
+      <h3>3. What this site does <em>not</em> do</h3>
+      <ul>
+        <li><strong>No cookies</strong> are set.</li>
+        <li><strong>No tracking</strong> or behavioral analytics
+          (no Google Analytics, Plausible, Matomo, etc.).</li>
+        <li><strong>No external fonts, scripts, or ad services</strong>
+          are loaded.</li>
+        <li><strong>No contact forms</strong> and no comments.</li>
+        <li><strong>No personal data is shared</strong> with third
+          parties beyond the GitHub hosting described above.</li>
+      </ul>
+      <p>
+        The site does store one technical preference in your browser's
+        <em>localStorage</em>: your selected color theme (light / dark /
+        auto). This value never leaves your browser and is not
+        transmitted to any server.
+      </p>
+
+      <h3>4. External links</h3>
+      <p>
+        This site links to external third-party services (e.g. GitHub,
+        LinkedIn). When you follow such a link you leave this site.
+        Data processing on those sites is the responsibility of their
+        respective providers and is governed by their own privacy
+        policies.
+      </p>
+
+      <h3>5. Your rights</h3>
+      <p>Under the GDPR you have the right to:</p>
+      <ul>
+        <li><strong>access</strong> your personal data (Art. 15 GDPR)</li>
+        <li><strong>rectification</strong> of inaccurate data
+          (Art. 16 GDPR)</li>
+        <li><strong>erasure</strong> ("right to be forgotten",
+          Art. 17 GDPR)</li>
+        <li><strong>restriction of processing</strong> (Art. 18 GDPR)</li>
+        <li><strong>object</strong> to processing (Art. 21 GDPR)</li>
+        <li><strong>data portability</strong> (Art. 20 GDPR)</li>
+        <li><strong>lodge a complaint</strong> with a supervisory
+          authority (Art. 77 GDPR)</li>
+      </ul>
+      <p>
+        To exercise any of these rights, an informal email to the
+        address above is sufficient.
+      </p>
+
+      <h3>6. Currency of this notice</h3>
+      <p>
+        This privacy notice is currently valid. Changes to the website
+        or legal requirements may make updates necessary. The
+        current version is always available at this URL.
+      </p>
+    </section>
+
+    <p class="muted small back">
+      <a href="{{ '/impressum/' | relative_url }}">→ Impressum / Legal notice</a>
+    </p>
+  </div>
+</article>

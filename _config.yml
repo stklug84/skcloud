@@ -1,0 +1,106 @@
+title: Steffen Klug
+tagline: Cloud Architect
+description: >-
+  Personal site of Steffen Klug — Cloud Architect. Blog posts, projects,
+  architectures & diagrams, books & trainings, and a scrollable CV.
+author: Steffen Klug
+email: ""
+url: "https://steffenklug.cloudsource"
+baseurl: ""
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+permalink: /blog/:year/:month/:day/:title/
+timezone: Europe/Berlin
+
+# GitHub Pages compatible plugins only
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Collections
+collections:
+  projects:
+    output: true
+    permalink: /projects/:path/
+  architectures:
+    output: true
+    permalink: /architectures/:path/
+  books:
+    output: true
+    permalink: /books/:path/
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+  - scope:
+      path: ""
+      type: projects
+    values:
+      layout: item
+      section: projects
+  - scope:
+      path: ""
+      type: architectures
+    values:
+      layout: item
+      section: architectures
+  - scope:
+      path: ""
+      type: books
+    values:
+      layout: item
+      section: books
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+# Navigation
+nav:
+  - title: Blog
+    url: /blog/
+  - title: Projects
+    url: /projects/
+  - title: Architectures
+    url: /architectures/
+  - title: Books & Trainings
+    url: /books/
+  - title: CV
+    url: /cv/
+
+# Social links (edit these)
+social:
+  github: stklug84
+  linkedin: ""
+  email: ""
+
+# Legal / Impressum information (edit these — required for the
+# Impressum & Datenschutz pages to be legally valid in Germany/EU).
+# The page falls back to "TODO …" placeholders when a value is empty,
+# so it's obvious what still needs to be filled in.
+# legal:
+#   name: "Steffen Klug"
+#   street: ""
+#   postal_code: ""
+#   city: ""
+#   country: "Germany"
+#   email: ""
+#   phone: ""
+#   # Person responsible for content per § 18 Abs. 2 MStV
+#   # (defaults to `name` if left blank).
+#   content_responsible: ""
+#   last_updated: "2026-05-08" # ISO date — bump when you change the page
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - vendor
+  - node_modules
+  - .github

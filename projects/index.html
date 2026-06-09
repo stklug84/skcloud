@@ -1,0 +1,35 @@
+---
+layout: default
+title: Projects
+permalink: /projects/
+description: Selected projects in cloud architecture, platforms, and developer experience.
+---
+
+<section class="page container">
+  <header class="page-header narrow">
+    <p class="eyebrow">Projects</p>
+    <h1>Selected work.</h1>
+    <p class="lede">A small selection of projects — from platform engineering to automation and developer experience.</p>
+  </header>
+
+  {% assign items = site.projects | sort: 'order' %}
+  {% if items.size == 0 %}
+    <p class="muted">No projects yet.</p>
+  {% else %}
+    <ul class="grid reveal-children">
+      {% for item in items %}
+        <li class="grid-card">
+          <a href="{{ item.url | relative_url }}">
+            {% if item.image %}<div class="grid-thumb"><img src="{{ item.image | relative_url }}" alt="{{ item.image_alt | default: item.title }}" loading="lazy"></div>{% endif %}
+            <div class="grid-body">
+              <p class="eyebrow">{% if item.year %}{{ item.year }}{% endif %}{% if item.role %} · {{ item.role }}{% endif %}</p>
+              <h3>{{ item.title }}</h3>
+              {% if item.subtitle %}<p class="muted">{{ item.subtitle }}</p>{% endif %}
+              {% if item.tags %}<ul class="tags small">{% for t in item.tags %}<li>{{ t }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</section>
