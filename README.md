@@ -82,37 +82,30 @@ obvious what still needs filling in.
 
 ## Architecture overview
 
-```text
-                        ┌──────────────────────────────────────┐
-                        │           GitHub repository          │
-                        │             stklug84/skcloud         │
-                        └───────────────────┬──────────────────┘
-                                            │
-                                            ▼
-                ┌────────────────────────────────────────────────┐
-                │   GitHub Actions (.github/workflows/*)         │
-                │   Thin callers → stklug84/github-workflows     │
-                │                                                │
-                │   • deploy-jekyll-to-github-pages.yml          │
-                │       push main → build + deploy to Pages      │
-                │   • deploy-jekyll-preview-per-commit.yml       │
-                │       push any branch → build + publish a      │
-                │       per-commit preview into the previews repo│
-                │   • validate-jekyll-pages.yml                  │
-                │       PR → build + advisory quality checks     │
-                │   • pr-preview-comment.yml                     │
-                │       PR → sticky comment with the preview URL │
-                └──────────┬─────────────────────────┬───────────┘
-                           │ deploy-pages            │ push /<sha>/
-                           ▼                         ▼
-                ┌────────────────────┐   ┌────────────────────────────┐
-                │ GitHub Pages (prod)│   │ blutoniumstrom/             │
-                │ custom domain CNAME│   │ blutoniumstrom.github.io    │
-                └─────────┬──────────┘   │ (static previews host)      │
-                          ▼              └──────────────┬─────────────┘
-              https://steffenklug.cloud                ▼
-                  (production)        https://blutoniumstrom.com/<short-sha>/
-                                              (per-commit preview)
+```mermaid
+flowchart TB
+  repo["GitHub repository<br/>stklug84/skcloud"]
+
+  subgraph gha["GitHub Actions (.github/workflows/*) — thin callers"]
+    deploy["deploy-jekyll-to-github-pages.yml<br/>push main → deploy"]
+    preview["deploy-jekyll-preview-per-commit.yml<br/>per-commit preview"]
+    validate["validate-jekyll-pages.yml<br/>PR build + advisory checks"]
+    comment["pr-preview-comment.yml<br/>sticky preview comment"]
+    codeql["codeql.yml<br/>CodeQL code scanning"]
+  end
+
+  central["stklug84/github-workflows<br/>reusable workflows"]
+  pages["GitHub Pages (prod)<br/>custom domain via CNAME"]
+  previews["blutoniumstrom/blutoniumstrom.github.io<br/>previews host"]
+  prod["steffenklug.cloud<br/>(production)"]
+  preview_url["blutoniumstrom.com/&lt;short-sha&gt;/<br/>(preview)"]
+
+  repo -- "push / PR" --> gha
+  gha -. "uses" .-> central
+  deploy -- "deploy-pages" --> pages
+  preview -- "push /&lt;sha&gt;/" --> previews
+  pages --> prod
+  previews --> preview_url
 ```
 
 ### Key principles
