@@ -1,0 +1,4 @@
+# Default owner for everything in the repo.
+# Required by the "Deploy productive" branch ruleset
+# (require_code_owner_review).
+* @stklug84

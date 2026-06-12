@@ -1,0 +1,54 @@
+# Dependabot configuration with grouped updates.
+#
+# One PR per ecosystem per week instead of one PR per dependency:
+#   - bundler:        jekyll + plugins (minor/patch grouped; majors
+#                     stay separate so breaking changes are reviewed
+#                     individually)
+#   - github-actions: all action/reusable-workflow bumps grouped
+version: 2
+
+updates:
+  - package-ecosystem: bundler
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Berlin
+    groups:
+      ruby-minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+      ruby-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+    labels:
+      - dependencies
+      - ruby
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Berlin
+    groups:
+      actions:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      actions-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+    labels:
+      - dependencies
+      - ci
+    commit-message:
+      prefix: "ci(deps)"
