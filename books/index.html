@@ -23,7 +23,7 @@ description: Books I recommend and trainings I've completed or teach.
           <a href="{{ item.url | relative_url }}">
             {% if item.image %}<div class="grid-thumb cover"><img src="{{ item.image | relative_url }}" alt="{{ item.title }} cover" loading="lazy"></div>{% endif %}
             <div class="grid-body">
-              <p class="eyebrow">{% if item.author %}{{ item.author }}{% endif %}{% if item.year %} · {{ item.year }}{% endif %}</p>
+              <p class="eyebrow">{% if item.author %}{{ item.author | escape }}{% endif %}{% if item.year %} · {{ item.year }}{% endif %}</p>
               <h3>{{ item.title }}</h3>
               {% if item.subtitle %}<p class="muted">{{ item.subtitle }}</p>{% endif %}
               {% if item.tags %}<ul class="tags small">{% for t in item.tags %}<li>{{ t }}</li>{% endfor %}</ul>{% endif %}

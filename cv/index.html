@@ -34,7 +34,7 @@ description: A scrollable CV — career, skills, and certifications.
             <li data-target="role-{{ forloop.index }}">
               <span class="dot" aria-hidden="true"></span>
               <span class="period tabular">{{ r.period }}</span>
-              <span class="role-mini">{{ r.role }}</span>
+              <span class="role-mini">{{ r.role | escape }}</span>
             </li>
           {% endfor %}
         </ol>
@@ -52,7 +52,7 @@ description: A scrollable CV — career, skills, and certifications.
           {% if r.bg %}data-bg="{{ r.bg | relative_url }}"{% endif %}
         >
           <p class="eyebrow tabular">{{ r.period }} · {{ r.org }}</p>
-          <h2>{{ r.role }}</h2>
+          <h2>{{ r.role | escape }}</h2>
           <p class="muted">{{ r.location }}</p>
           <p class="lede">{{ r.summary }}</p>
           {% if r.bullets %}
@@ -70,7 +70,7 @@ description: A scrollable CV — career, skills, and certifications.
     </div>
 
     {%- comment -%} Right rail: per-scene crest / monogram (sticky-stack). {%- endcomment -%}
-    <aside class="cv-rail cv-rail-right" aria-hidden="true">
+    <aside class="cv-rail cv-rail-right" aria-hidden="true" aria-label="Career timeline cues">
       <ol class="cv-cues">
         {% for r in cv.roles %}
           <li class="cv-cue" data-target="role-{{ forloop.index }}" data-kind="{{ r.kind | default: 'work' }}">
@@ -97,7 +97,7 @@ description: A scrollable CV — career, skills, and certifications.
       <ul class="skill-groups">
         {% for g in cv.skills %}
           <li>
-            <h3>{{ g.group }}</h3>
+            <h3>{{ g.group | escape }}</h3>
             <ul class="tags">
               {% for s in g.items %}<li>{{ s }}</li>{% endfor %}
             </ul>

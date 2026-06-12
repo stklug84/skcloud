@@ -13,7 +13,7 @@ links:
 Designed and rolled out a multi-subscription Azure landing zone with policy-as-code,
 network segmentation, and a self-service onboarding flow for product teams.
 
-**Highlights**
+## Highlights
 
 - Hub-and-spoke topology with private endpoints and Azure Firewall
 - Policy-as-code with Bicep + GitHub Actions

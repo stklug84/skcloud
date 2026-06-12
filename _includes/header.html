@@ -10,7 +10,7 @@
     </a>
 
     <nav class="site-nav" aria-label="Primary">
-      <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu">
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
         <span class="sr-only">Menu</span>
         <span class="bar" aria-hidden="true"></span>
         <span class="bar" aria-hidden="true"></span>
@@ -19,7 +19,7 @@
         {% for item in site.nav %}
           {% assign current = false %}
           {% if page.url contains item.url and item.url != '/' %}{% assign current = true %}{% endif %}
-          <li><a href="{{ item.url | relative_url }}"{% if current %} aria-current="page"{% endif %}>{{ item.title }}</a></li>
+          <li><a href="{{ item.url | relative_url }}"{% if current %} aria-current="page"{% endif %}>{{ item.title | escape }}</a></li>
         {% endfor %}
         <li>
           <button class="theme-toggle" type="button" aria-label="Toggle color theme" title="Toggle theme">

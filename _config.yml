@@ -5,7 +5,7 @@ description: >-
   architectures & diagrams, books & trainings, and a scrollable CV.
 author: Steffen Klug
 email: ""
-url: "https://steffenklug.cloudsource"
+url: "https://steffenklug.cloud"
 baseurl: ""
 
 # Build settings
@@ -101,6 +101,7 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - README.md
+  - CONTRIBUTING.md
   - vendor
   - node_modules
   - .github

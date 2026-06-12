@@ -1,5 +1,10 @@
 # skcloud — steffenklug.cloud
 
+[![Deploy Jekyll to GitHub Pages](https://github.com/stklug84/skcloud/actions/workflows/deploy-jekyll-to-github-pages.yml/badge.svg)](https://github.com/stklug84/skcloud/actions/workflows/deploy-jekyll-to-github-pages.yml)
+[![Per-commit preview](https://github.com/stklug84/skcloud/actions/workflows/deploy-jekyll-preview-per-commit.yml/badge.svg)](https://github.com/stklug84/skcloud/actions/workflows/deploy-jekyll-preview-per-commit.yml)
+[![Validate Jekyll Pages](https://github.com/stklug84/skcloud/actions/workflows/validate-jekyll-pages.yml/badge.svg)](https://github.com/stklug84/skcloud/actions/workflows/validate-jekyll-pages.yml)
+[![PR preview comment](https://github.com/stklug84/skcloud/actions/workflows/pr-preview-comment.yml/badge.svg)](https://github.com/stklug84/skcloud/actions/workflows/pr-preview-comment.yml)
+
 Personal site of **Steffen Klug, Cloud Architect** — a Jekyll-based website
 deployed to GitHub Pages at <https://steffenklug.cloud>.
 
@@ -9,9 +14,14 @@ framework. It uses only plugins that are whitelisted by GitHub Pages so the
 site can be built directly by GitHub's hosted Jekyll action.
 
 > **TL;DR**
+>
 > 1. Fork / clone the repo.
-> 2. Edit content as Markdown files in `_posts/`, `_projects/`, `_architectures/`, `_books/`, or `_data/cv.yml`.
-> 3. Push to `main` → production at `/`. Push to `develop` → canary preview at `/canary/`.
+> 2. Edit content as Markdown files in `_posts/`, `_projects/`,
+>    `_architectures/`, `_books/`, or `_data/cv.yml`.
+> 3. Push to `main` → production at <https://steffenklug.cloud>. Open a
+>    PR → a per-commit preview is published to
+>    `https://blutoniumstrom.com/<short-sha>/` and linked in a sticky PR
+>    comment.
 
 ---
 
@@ -30,7 +40,7 @@ site can be built directly by GitHub's hosted Jekyll action.
 - [JavaScript behavior](#javascript-behavior)
 - [Build and deployment](#build-and-deployment)
   - [GitHub Pages workflows](#github-pages-workflows)
-  - [Canary deployment](#canary-deployment)
+  - [Previews](#previews)
   - [Local development](#local-development)
 - [Configuration reference](#configuration-reference)
 - [Custom domain (CNAME)](#custom-domain-cname)
@@ -44,16 +54,19 @@ site can be built directly by GitHub's hosted Jekyll action.
 The site is organized around five top-level sections, each linked from the
 header navigation defined in `_config.yml` (`site.nav`):
 
-| Section                  | URL              | Backed by                    | Index file                  |
-| ------------------------ | ---------------- | ---------------------------- | --------------------------- |
-| Home                     | `/`              | `index.html`                 | `index.html`                |
-| Blog                     | `/blog/`         | `_posts/*.md`                | `blog/index.html`           |
-| Projects                 | `/projects/`     | `_projects/*.md` collection  | `projects/index.html`       |
-| Architectures & Diagrams | `/architectures/`| `_architectures/*.md` coll.  | `architectures/index.html`  |
-| Books & Trainings        | `/books/`        | `_books/*.md` collection     | `books/index.html`          |
-| CV                       | `/cv/`           | `_data/cv.yml`               | `cv/index.html`             |
-| Impressum                | `/impressum/`    | `site.legal` in `_config.yml`| `impressum/index.html`      |
-| Datenschutz              | `/datenschutz/`  | `site.legal` in `_config.yml`| `datenschutz/index.html`    |
+| Section                  | URL               | Backed by                     |
+| ------------------------ | ----------------- | ----------------------------- |
+| Home                     | `/`               | `index.html`                  |
+| Blog                     | `/blog/`          | `_posts/*.md`                 |
+| Projects                 | `/projects/`      | `_projects/*.md` collection   |
+| Architectures & Diagrams | `/architectures/` | `_architectures/*.md` coll.   |
+| Books & Trainings        | `/books/`         | `_books/*.md` collection      |
+| CV                       | `/cv/`            | `_data/cv.yml`                |
+| Impressum                | `/impressum/`     | `site.legal` in `_config.yml` |
+| Datenschutz              | `/datenschutz/`   | `site.legal` in `_config.yml` |
+
+Each section is rendered by an `index.html` in the folder matching its URL
+(for example `blog/index.html` for `/blog/`).
 
 The CV uses a YAML data file (instead of a collection) because all roles are
 rendered on a single scrolling page — there are no per-role detail pages.
@@ -69,53 +82,58 @@ obvious what still needs filling in.
 
 ## Architecture overview
 
-```
+```text
                         ┌──────────────────────────────────────┐
                         │           GitHub repository          │
-                        │              (main / develop)        │
+                        │             stklug84/skcloud         │
                         └───────────────────┬──────────────────┘
                                             │
                                             ▼
                 ┌────────────────────────────────────────────────┐
                 │   GitHub Actions (.github/workflows/*)         │
+                │   Thin callers → stklug84/github-workflows     │
                 │                                                │
-                │   • smart-canary-deployment.yml  (default)     │
-                │       - Builds main      → _site/              │
-                │       - Builds develop   → _site/canary/       │
-                │       - Injects "🐣 Canary" badge on canary    │
-                │       - Caches _site between runs              │
-                │                                                │
-                │   • jekyll-gh-pages.yml (manual fallback)      │
-                │       - Plain build of main only               │
-                └───────────────────┬────────────────────────────┘
-                                    │  upload-pages-artifact
-                                    ▼
-                        ┌────────────────────────────┐
-                        │   GitHub Pages (Pages env) │
-                        │   custom domain: CNAME     │
-                        └────────────┬───────────────┘
-                                     ▼
-                          https://steffenklug.cloud           (production)
-                          https://steffenklug.cloud/canary/   (preview)
+                │   • deploy-jekyll-to-github-pages.yml          │
+                │       push main → build + deploy to Pages      │
+                │   • deploy-jekyll-preview-per-commit.yml       │
+                │       push any branch → build + publish a      │
+                │       per-commit preview into the previews repo│
+                │   • validate-jekyll-pages.yml                  │
+                │       PR → build + advisory quality checks     │
+                │   • pr-preview-comment.yml                     │
+                │       PR → sticky comment with the preview URL │
+                └──────────┬─────────────────────────┬───────────┘
+                           │ deploy-pages            │ push /<sha>/
+                           ▼                         ▼
+                ┌────────────────────┐   ┌────────────────────────────┐
+                │ GitHub Pages (prod)│   │ blutoniumstrom/             │
+                │ custom domain CNAME│   │ blutoniumstrom.github.io    │
+                └─────────┬──────────┘   │ (static previews host)      │
+                          ▼              └──────────────┬─────────────┘
+              https://steffenklug.cloud                ▼
+                  (production)        https://blutoniumstrom.com/<short-sha>/
+                                              (per-commit preview)
 ```
 
-**Key principles**
+### Key principles
 
 - **Static-first.** All pages are pre-rendered HTML. No runtime back-end.
 - **GitHub-Pages-compatible plugins only** (`jekyll-feed`, `jekyll-seo-tag`,
   `jekyll-sitemap`). No custom plugins, no `_plugins/` folder.
 - **Zero-dep front-end.** Vanilla CSS (custom-properties, no Sass) and one
   small vanilla JS file (no bundler, no framework).
-- **`relative_url` everywhere** so the site works at both `/` and `/canary/`.
+- **`relative_url` everywhere** so the site works at both `/` and under a
+  per-commit preview subpath like `/<short-sha>/`.
 
 ---
 
 ## Repository layout
 
-```
+```text
 .
 ├── _config.yml                # Jekyll site config (collections, nav, plugins)
-├── Gemfile                    # Ruby gems (Jekyll, github-pages)
+├── Gemfile                    # Ruby gems (Jekyll 4 + plugins)
+├── .ruby-version              # Pinned Ruby (4.0.5) for local + CI
 ├── CNAME                      # Custom domain for GitHub Pages
 │
 ├── _layouts/                  # Page templates
@@ -149,9 +167,11 @@ obvious what still needs filling in.
 │   └── favicon.svg            # SVG favicon
 │
 └── .github/
-    └── workflows/
-        ├── jekyll-gh-pages.yml          # Manual fallback build
-        └── smart-canary-deployment.yml  # Production + canary build
+    └── workflows/                                # thin callers → stklug84/github-workflows
+        ├── deploy-jekyll-to-github-pages.yml     # Production deploy (push main)
+        ├── deploy-jekyll-preview-per-commit.yml  # Per-commit preview (any branch)
+        ├── validate-jekyll-pages.yml             # PR build + quality checks
+        └── pr-preview-comment.yml                # Sticky PR preview comment
 ```
 
 ---
@@ -359,20 +379,19 @@ Implementation:
 
 ### Component classes
 
-| Class                       | Used for                                     |
-| --------------------------- | -------------------------------------------- |
-| `.container`, `.narrow`     | Max-width wrappers                           |
-| `.btn.primary`, `.btn.ghost`| Primary / secondary buttons                  |
-| `.eyebrow`                  | Small uppercase label above headings         |
-| `.lede`                     | Large secondary paragraph after a heading    |
-| `.cards` / `.card`          | Homepage feature grid                        |
-| `.grid` / `.grid-card`      | Projects / architectures / books grids       |
-| `.post-list` / `.post-row`  | Blog index list                              |
-| `.tags` / `.tags.small`     | Small chip lists                             |
-| `.cv-scroll`, `.cv-scene`,
-  `.cv-timeline`              | CV scrollorama (see CV section above)        |
-| `.reveal`, `.reveal-children`| Opt-in scroll-reveal animation              |
-| `.prose`                    | Long-form article content (blog/item bodies) |
+| Class                         | Used for                                   |
+| ----------------------------- | ------------------------------------------ |
+| `.container`, `.narrow`       | Max-width wrappers                         |
+| `.btn.primary`, `.btn.ghost`  | Primary / secondary buttons                |
+| `.eyebrow`                    | Small uppercase label above headings       |
+| `.lede`                       | Large secondary paragraph after a heading  |
+| `.cards` / `.card`            | Homepage feature grid                      |
+| `.grid` / `.grid-card`        | Projects / architectures / books grids     |
+| `.post-list` / `.post-row`    | Blog index list                            |
+| `.tags` / `.tags.small`       | Small chip lists                           |
+| `.cv-scroll/-scene/-timeline` | CV scrollorama (see CV section above)      |
+| `.reveal`, `.reveal-children` | Opt-in scroll-reveal animation             |
+| `.prose`                      | Long-form article content (blog / items)   |
 
 To animate something on scroll, just add `class="reveal"` (or wrap a list in
 `reveal-children` to stagger its children). The JS handles the rest.
@@ -411,121 +430,125 @@ immediately.
 
 ### GitHub Pages workflows
 
-Two workflows live in `.github/workflows/`. Both write to the
-`github-pages` deployment environment, so only one runs at a time
-(`concurrency: pages`).
+Four workflows live in `.github/workflows/`. They are **thin callers**: the
+trigger, permissions, and concurrency live here, while the actual build and
+deploy logic lives in the central reusable workflows under
+[`stklug84/github-workflows`](https://github.com/stklug84/github-workflows)
+(pinned at `@v1.2.1`).
 
-#### 1. `smart-canary-deployment.yml` — production + canary (default)
+#### 1. `deploy-jekyll-to-github-pages.yml` — production deploy
 
-Triggered on push to `main` or `develop`, and on manual dispatch.
+Triggered on push to `main` (and manual dispatch). Delegates to
+`jekyll-deploy-pages.yml`, which builds the site with Bundler and deploys it
+to the `github-pages` environment. Uses the automatic `GITHUB_TOKEN`.
+`concurrency: pages` ensures one production deploy at a time.
 
-Pipeline:
+#### 2. `deploy-jekyll-preview-per-commit.yml` — per-commit preview
 
-1. Checks out **`main`** into `main-source/` (always).
-2. Detects whether core files changed in `main` (Gemfile, layouts,
-   `_includes`, `_posts`, assets, etc.) using `dorny/paths-filter`.
-3. Tries to restore a cached `_site/` from a previous run.
-4. Sets up Ruby 3.3 with `ruby/setup-ruby@v1` and `bundler-cache: true`.
-5. Builds `main` with `bundle exec jekyll build --destination ../_site`
-   **only if** the cache missed or core files changed in `main`.
-6. Checks out **`develop`** into `canary-source/` (continues on error if
-   the branch doesn't exist).
-7. If `develop` has a `Gemfile`, installs deps, **injects a yellow
-   "🐣 Canary Build" badge** into `_layouts/default.html`, and builds
-   into `_site/canary/` with `--baseurl "/canary"`.
-8. Uploads `_site/` (which now contains both production and canary) and
-   deploys via `actions/deploy-pages@v4`.
+Triggered on push to **any** branch (and manual dispatch). Delegates to
+`jekyll-deploy-preview.yml`, which builds the site with
+`baseurl: /<short-sha>` and `url: https://blutoniumstrom.com`, then commits
+the output into a `/<short-sha>/` folder of the previews repo
+[`blutoniumstrom/blutoniumstrom.github.io`](https://github.com/blutoniumstrom/blutoniumstrom.github.io)
+and prunes to the newest 20 previews. The push uses the
+`PREVIEWS_DEPLOY_TOKEN` secret (a PAT with `Contents: write` on the previews
+repo, since it lives under a different account).
 
-The injected badge is added in the runner only — the repo's
-`_layouts/default.html` is never modified by the workflow.
+#### 3. `validate-jekyll-pages.yml` — PR validation
 
-#### 2. `jekyll-gh-pages.yml` — manual fallback
+Triggered on PRs into `main`. Delegates to `jekyll-validate-pages.yml`, which
+runs a Bundler build plus advisory quality checks. The required status check
+is exposed as `validate / build`.
 
-A minimal "GitHub-managed" build using `actions/jekyll-build-pages@v1`. It
-is `workflow_dispatch`-only by default and doesn't build the canary. Use
-it as a sanity-check fallback if the smart workflow ever has trouble.
+#### 4. `pr-preview-comment.yml` — PR preview comment
 
-### Canary deployment
+Triggered on PRs into `main`. Delegates to `misc-pr-preview-comment.yml`,
+which upserts a sticky comment linking to
+`https://blutoniumstrom.com/<short-sha>/` for the PR's head commit.
 
-The canary build is **identical to production** except:
+### Previews
 
-- `--baseurl "/canary"` is passed to Jekyll, which means every URL
-  produced by `relative_url` (and therefore every link, asset, image
-  reference, and CSS/JS path in this site) is prefixed with `/canary`.
-- A yellow "🐣 Canary Build" badge with a "Back to Live" link to `/` is
-  injected into the bottom-right of every page.
+Previews are **per-commit** and live in a separate static host repo
+(`blutoniumstrom/blutoniumstrom.github.io`, custom domain
+`blutoniumstrom.com`). Every branch push builds the site and publishes it to
+`https://blutoniumstrom.com/<short-sha>/`; the URL is surfaced on the PR via
+the sticky preview comment.
 
 To preview a change before promoting it:
 
 ```bash
-git checkout -b develop          # if you haven't yet
+git switch -c feat/my-change     # branch off main
 # ... make changes ...
-git push origin develop          # triggers a canary build
-# Preview at https://steffenklug.cloud/canary/
-git checkout main && git merge develop && git push origin main
-# Promotes to https://steffenklug.cloud/
+git push -u origin feat/my-change   # triggers a per-commit preview
+# Open a PR into main; the sticky comment links to
+# https://blutoniumstrom.com/<short-sha>/
 ```
 
 > **Important:** because all internal links use `relative_url`, *never*
 > hard-code absolute paths like `/assets/css/main.css` or
 > `/blog/`. Always use `{{ '/path' | relative_url }}`. Otherwise links
-> break inside the canary subdirectory.
+> break inside the per-commit preview subdirectory.
 
 ### Local development
 
-You'll need a recent Ruby (the CI uses **Ruby 3.3**) and Bundler.
+You'll need **Ruby 4.0.5** (pinned in `.ruby-version` and used by CI) and Bundler.
 
 ```bash
 # from repo root
-bundle install                   # installs Jekyll, github-pages, etc.
+bundle install                   # installs Jekyll 4 + plugins
 bundle exec jekyll serve         # http://localhost:4000  (live reload)
 # or just build:
 bundle exec jekyll build         # outputs to ./_site
 ```
 
-To preview the canary baseurl behavior locally:
+To simulate a per-commit preview baseurl locally (replace `<short-sha>`):
 
 ```bash
-bundle exec jekyll serve --baseurl "/canary"
-# now open http://localhost:4000/canary/
+bundle exec jekyll serve --baseurl "/<short-sha>"
+# now open http://localhost:4000/<short-sha>/
 ```
 
 #### Pinned versions
 
-The `Gemfile` pins **`github-pages ~> 232`**, which transitively gives:
+The `Gemfile` uses **standalone Jekyll 4** (not the `github-pages` metagem,
+which is locked to `commonmarker 0.23.x` and cannot run on Ruby 4). The site
+is built with Bundler in CI and the artifact is deployed, so GitHub's
+server-side Jekyll is not used.
 
-| Gem            | Version  | Why it matters                                      |
-| -------------- | -------- | --------------------------------------------------- |
-| `jekyll`       | 3.10.0   | Matches what GitHub Pages currently runs            |
-| `liquid`       | 4.0.4    | **Required.** `4.0.3` calls `String#tainted?` which Ruby 3.2+ removed — builds break on Ruby 3.3 runners |
-| `kramdown`     | 2.4.0    | Markdown engine                                     |
-| `rouge`        | 3.30.0   | Syntax highlighter                                  |
+| Gem               | Version | Why it matters                           |
+| ----------------- | ------- | ---------------------------------------- |
+| `jekyll`          | 4.4.x   | Site generator (Ruby 4 compatible)       |
+| `jekyll-feed`     | 0.17.x  | Atom feed                                |
+| `jekyll-seo-tag`  | 2.9.x   | SEO/meta tags                            |
+| `jekyll-sitemap`  | 1.4.x   | sitemap.xml                              |
+| `kramdown`        | 2.5.x   | Markdown engine                          |
+| `liquid`          | 4.0.x   | Template engine                          |
 
-> **Don't downgrade `github-pages` below 232.** v223 hard-pinned
-> `liquid = 4.0.3` and breaks on the Ruby 3.3.x that GitHub Actions ships.
-
-The `Gemfile` also adds back `csv`, `bigdecimal`, `logger`, and `base64`,
+The `Gemfile` also adds `csv`, `bigdecimal`, `logger`, and `base64`,
 which Ruby 3.4+ moved out of the default stdlib but Jekyll still requires.
-These are harmless on Ruby 3.3.
+On Ruby 4.x they are mandatory.
 
-#### Ruby 4 note
+#### Ruby version
 
-If you're on a system where the default Ruby is 4.0+ (some macOS Homebrew
-setups symlink `ruby@3.3` to Ruby 4), gem resolution will fail because
-`commonmarker` doesn't support Ruby 4 yet. **CI is unaffected** because
-the workflow pins Ruby 3.3.11. To preview locally, use a real Ruby 3.3 via
-`mise`/`rbenv`/`asdf`, or use Docker:
+This project targets **Ruby 4.0.5** (see `.ruby-version`). Use a matching
+local Ruby via `mise`/`rbenv`/`asdf`, then:
 
 ```bash
-# Resolve gems and run a build in a Ruby 3.3 container
-docker run --rm -v "$PWD:/work" -w /work ruby:3.3.11-slim bash -c "
+bundle install
+bundle exec jekyll serve --host 0.0.0.0
+# Then open http://localhost:4000
+```
+
+If `bundle install` fails locally because a native extension needs a C
+toolchain, make sure build tools are installed, or build in a container:
+
+```bash
+docker run --rm -v "$PWD:/work" -w /work ruby:4.0.5-slim bash -c "
   apt-get update -qq && apt-get install -y -qq build-essential git >/dev/null
   gem install bundler --no-document
   bundle install
   bundle exec jekyll serve --host 0.0.0.0
 "
-
-# Then open http://localhost:4000
 ```
 
 ### Useful commands
@@ -543,19 +566,19 @@ bundle exec jekyll doctor                 # config sanity check
 
 `_config.yml` is the single source of truth for site-wide settings.
 
-| Key                  | What it controls                                         |
-| -------------------- | -------------------------------------------------------- |
-| `title`              | Site title (used in `<title>`, header brand)             |
-| `tagline`            | Subtitle shown alongside the title                       |
-| `description`        | Default `<meta name="description">` and SEO              |
-| `author`             | Used in the footer copyright                             |
-| `url` / `baseurl`    | Canonical site URL (no trailing slash)                   |
-| `permalink`          | Blog post URL pattern                                    |
-| `plugins`            | Only GitHub-Pages-allowed plugins                        |
-| `collections`        | Defines `projects`, `architectures`, `books`             |
-| `defaults`           | Default `layout` per content type                        |
-| `nav`                | Top navigation items (used by `_includes/header.html`)   |
-| `social`             | GitHub / LinkedIn / email used in the footer             |
+| Key               | What it controls                                        |
+| ----------------- | ------------------------------------------------------- |
+| `title`           | Site title (used in `<title>`, header brand)            |
+| `tagline`         | Subtitle shown alongside the title                      |
+| `description`     | Default `<meta name="description">` and SEO             |
+| `author`          | Used in the footer copyright                            |
+| `url` / `baseurl` | Canonical site URL (no trailing slash)                  |
+| `permalink`       | Blog post URL pattern                                   |
+| `plugins`         | Only GitHub-Pages-allowed plugins                       |
+| `collections`     | Defines `projects`, `architectures`, `books`            |
+| `defaults`        | Default `layout` per content type                       |
+| `nav`             | Top navigation items (used by `_includes/header.html`)  |
+| `social`          | GitHub / LinkedIn / email used in the footer            |
 
 To add another nav item:
 
@@ -570,12 +593,14 @@ Then create `talks/index.html` (or a collection if you want detail pages).
 ### Adding a new collection
 
 1. Add the collection to `_config.yml`:
+
    ```yaml
    collections:
      talks:
        output: true
        permalink: /talks/:path/
    ```
+
 2. Add a default `layout: item` and `section: talks` so item pages render
    with the standard detail template.
 3. Create `_talks/` and put one Markdown file per talk inside.

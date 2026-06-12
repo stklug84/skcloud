@@ -5,8 +5,8 @@ propose changes — whether you're fixing a typo, adding a blog post, or
 shipping a new section.
 
 This is a small personal site, but the workflow is set up so that anyone
-can submit a clean PR and have it previewed automatically on the canary
-URL before it goes live.
+can submit a clean PR and have it previewed automatically on a per-commit
+preview URL before it goes live.
 
 ---
 
@@ -51,23 +51,22 @@ URL before it goes live.
 | Branch     | Purpose                                                 |
 | ---------- | ------------------------------------------------------- |
 | `main`     | Production. Always deployable. Protected.               |
-| `develop`  | Canary preview. Auto-deployed to `/canary/`.            |
-| `feat/*`   | Short-lived feature branches off `develop`.             |
-| `fix/*`    | Short-lived bug-fix branches off `develop` or `main`.   |
+| `feat/*`   | Short-lived feature branches off `main`.                |
+| `fix/*`    | Short-lived bug-fix branches off `main`.                |
 | `content/*`| Content-only changes (posts, CV updates, etc.).         |
 
-**Typical flow**
+### Typical flow
 
 ```text
-   feat/dark-mode-tweaks  ── PR ──▶  develop  ── PR ──▶  main
-                                      │
-                                      └── auto-deploys to /canary/
+   feat/dark-mode-tweaks  ── push ──▶  per-commit preview at
+                                       blutoniumstrom.com/<short-sha>/
+                          ── PR ────▶  main  ──▶  production
 ```
 
-For **content-only changes** you can branch directly off `main` and PR
-straight into `main`. For **anything that touches layouts, CSS, JS, or
-the workflow files**, use `develop` so the change gets a canary preview
-first.
+Branch off `main`, push, and open a PR into `main`. Every push (on any
+branch) automatically builds a **per-commit preview** published to
+`https://blutoniumstrom.com/<short-sha>/`; the URL is posted as a sticky
+comment on the PR.
 
 ---
 
@@ -75,9 +74,9 @@ first.
 
 You'll need:
 
-- **Ruby 3.3** (the version pinned by CI).
-  Newer Rubies *may* work — see the Ruby 3.4 / Ruby 4 notes in the
-  [README](./README.md#local-development) — but 3.3 is the supported version.
+- **Ruby 4.0.5** (pinned in `.ruby-version` and used by CI).
+  Use `mise`/`rbenv`/`asdf` to match it — see the
+  [README](./README.md#ruby-version).
 - **Bundler** (`gem install bundler`).
 - **Git**.
 
@@ -87,11 +86,11 @@ cd skcloud
 bundle install
 ```
 
-If you don't have a system Ruby 3.3 (or you're on macOS Homebrew where
-`ruby@3.3` is currently symlinked to Ruby 4), use Docker:
+If you don't have a system Ruby 4.0.5, use Docker:
 
 ```bash
-docker run --rm -it -p 4000:4000 -v "$PWD:/work" -w /work ruby:3.3.11-slim bash -c "
+docker run --rm -it -p 4000:4000 -v "$PWD:/work" -w /work \
+  ruby:4.0.5-slim bash -c "
   apt-get update -qq && apt-get install -y -qq build-essential git >/dev/null
   gem install bundler --no-document
   bundle install
@@ -99,9 +98,9 @@ docker run --rm -it -p 4000:4000 -v "$PWD:/work" -w /work ruby:3.3.11-slim bash 
 "
 ```
 
-> **Why not the official `jekyll/jekyll` image?** It ships Jekyll 3.9 +
-> liquid 4.0.3, which has a `String#tainted?` call that breaks on modern
-> Ruby. We pin `github-pages ~> 232` to avoid this — see the README's
+> **Why the `ruby:4.0.5-slim` image?** It matches `.ruby-version`. We use
+> standalone **Jekyll 4** (not the `github-pages` metagem, which is locked to
+> `commonmarker 0.23.x` and can't run on Ruby 4) — see the README's
 > [pinned versions](./README.md#pinned-versions) section.
 
 ---
@@ -116,15 +115,16 @@ bundle exec jekyll serve --livereload
 Useful flags:
 
 ```bash
-bundle exec jekyll serve --drafts            # include _drafts/
-bundle exec jekyll serve --baseurl "/canary" # simulate the canary build
-bundle exec jekyll build  --trace            # full backtrace on errors
-bundle exec jekyll doctor                    # config sanity check
+bundle exec jekyll serve --drafts              # include _drafts/
+bundle exec jekyll serve --baseurl "/<sha>"    # simulate a per-commit preview
+bundle exec jekyll build  --trace              # full backtrace on errors
+bundle exec jekyll doctor                      # config sanity check
 ```
 
-When you push a branch to GitHub, the canary workflow only runs on
-`develop`. To get a canary URL for a feature branch, merge it into
-`develop` first.
+When you push a branch to GitHub, the per-commit preview workflow runs on
+**every** branch and publishes the build to
+`https://blutoniumstrom.com/<short-sha>/`. Open a PR into `main` to get the
+preview URL posted as a sticky comment.
 
 ---
 
@@ -135,6 +135,7 @@ When you push a branch to GitHub, the canary workflow only runs on
 1. Create `_posts/YYYY-MM-DD-your-slug.md`. The date in the filename is
    required.
 2. Add front-matter:
+
    ```yaml
    ---
    title: "Your post title, in sentence case"
@@ -143,6 +144,7 @@ When you push a branch to GitHub, the canary workflow only runs on
    tags: [azure, platform]
    ---
    ```
+
 3. Write the body in Markdown. Keep paragraphs short. Use `##` and `###`
    for sub-sections (don't reuse `#` — that's the post title).
 4. Preview locally (`jekyll serve`) and check that the post appears in
@@ -156,12 +158,15 @@ when you pass `--drafts` to `jekyll serve`.
 
 Pick the right collection:
 
-| Section         | Folder            | Required fields                                  |
-| --------------- | ----------------- | ------------------------------------------------ |
-| Projects        | `_projects/`      | `title`, `year`, `order` *(for sort)*            |
-| Architectures   | `_architectures/` | `title`, `cloud`, `year`, `order`                |
-| Books           | `_books/`         | `title`, `kind: book`, `author`, `year`          |
-| Trainings       | `_books/`         | `title`, `kind: training`, `provider`, `year`    |
+| Section           | Folder            | Required fields                    |
+| ----------------- | ----------------- | ---------------------------------- |
+| Projects          | `_projects/`      | `title`, `year`, `order`           |
+| Architectures     | `_architectures/` | `title`, `cloud`, `year`, `order`  |
+| Books / Trainings | `_books/`         | `title`, `kind`, `year`            |
+
+`order` controls the sort position within a section. Books use
+`kind: book` plus `author`; trainings use `kind: training` plus
+`provider`.
 
 Common optional fields: `subtitle`, `tags` (list), `image`, `image_alt`,
 `links` (list of `{label, url}`).
@@ -231,13 +236,16 @@ No template changes needed — just edit the YAML and push.
 
 1. Put the file in `assets/images/`.
 2. Reference it in front-matter or Markdown using a `relative_url` path:
+
    ```yaml
    image: /assets/images/my-diagram.svg
    image_alt: "Hub-and-spoke topology with private endpoints."
    ```
+
    ```markdown
-   ![Diagram of a landing zone]({{ '/assets/images/landing-zone.png' | relative_url }})
+   ![Landing zone]({{ '/assets/images/landing-zone.png' | relative_url }})
    ```
+
 3. **Always provide an `alt` text.** It's required for accessibility.
 4. Optimize images before committing:
    - SVG: run through `svgo`.
@@ -263,6 +271,7 @@ etc.). Find the right block, make your change, save.
 This is rare. If you really need it (say, a `/talks/` section):
 
 1. Add a collection in `_config.yml`:
+
    ```yaml
    collections:
      talks:
@@ -274,12 +283,15 @@ This is rare. If you really need it (say, a `/talks/` section):
          layout: item
          section: talks
    ```
+
 2. Add a nav entry:
+
    ```yaml
    nav:
      - title: Talks
        url: /talks/
    ```
+
 3. Create `_talks/` and one Markdown file per item.
 4. Create `talks/index.html`, modeling on `projects/index.html`.
 5. If the section needs a special "back" label, extend the `case`
@@ -299,15 +311,17 @@ scope.
 - One sentence per line for long paragraphs is fine (it makes diffs much
   cleaner) — Markdown still renders them as one paragraph.
 - Use fenced code blocks with a language hint:
+
   ````markdown
   ```bash
   bundle exec jekyll serve
   ```
   ````
+
 - Use blockquotes (`>`) for callouts.
 - Link with `[text](url)` for external links; use
-  `{{ '/path' | relative_url }}` for internal links so the canary build
-  still works.
+  `{{ '/path' | relative_url }}` for internal links so the per-commit
+  preview build still works.
 
 ### YAML front-matter
 
@@ -319,11 +333,13 @@ scope.
 ### HTML / Liquid
 
 - All asset and link URLs must go through `relative_url`:
+
   ```liquid
   <a href="{{ '/blog/' | relative_url }}">Blog</a>
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
   ```
-  Hard-coded `/...` paths break the canary build.
+
+  Hard-coded `/...` paths break the per-commit preview build.
 - Indent with 2 spaces.
 - Prefer semantic tags (`<article>`, `<nav>`, `<section>`, `<header>`,
   `<footer>`) over generic `<div>`.
@@ -350,12 +366,12 @@ scope.
 
 Use a short, imperative subject line, optionally with a scope:
 
-```
+```text
 content(blog): add post on AKS Automatic
 style(cv): tighten timeline spacing on mobile
 fix(nav): close mobile menu on Esc
-docs: clarify canary deployment in README
-chore(deps): bump github-pages to latest
+docs: clarify preview deployment in README
+chore(deps): bump jekyll to latest
 ```
 
 Common scopes: `blog`, `cv`, `projects`, `architectures`, `books`,
@@ -373,24 +389,30 @@ Before opening a PR:
 2. **Test light + dark.** Click the theme toggle in the header and
    verify your change looks good in both. Resize the browser narrow
    (≤ 760 px) to check the mobile layout.
-3. **Test the canary baseurl.** If you changed any links, run:
+3. **Test a preview baseurl.** If you changed any links, run (use any
+   placeholder for `<sha>`):
+
    ```bash
-   bundle exec jekyll serve --baseurl "/canary"
-   # then visit http://localhost:4000/canary/
+   bundle exec jekyll serve --baseurl "/<sha>"
+   # then visit http://localhost:4000/<sha>/
    ```
+
    All internal links should still work.
 4. **Run jekyll doctor:**
+
    ```bash
    bundle exec jekyll doctor
    ```
+
 5. **Sanity-check the build:**
+
    ```bash
    bundle exec jekyll build --trace
    # check ./_site/ for the expected files
    ```
 
-CI runs the same build with Ruby 3.3 — if your local build passes on
-3.3, CI will almost always pass too.
+CI runs the same build with Ruby 4.0.5 — if your local build passes on
+4.0.5, CI will almost always pass too.
 
 ---
 
@@ -399,8 +421,7 @@ CI runs the same build with Ruby 3.3 — if your local build passes on
 When opening a PR, please tick these boxes (or call out why one
 doesn't apply):
 
-- [ ] PR targets `develop` (for code/style/layout) **or** `main` (for
-      content-only).
+- [ ] PR targets `main`.
 - [ ] One topic per PR.
 - [ ] `bundle exec jekyll build` succeeds locally.
 - [ ] Tested in **both** light and dark theme.
@@ -411,9 +432,9 @@ doesn't apply):
 - [ ] No secrets or private info committed.
 - [ ] Commit messages follow the [style guide](#commit-messages).
 
-After your PR is merged into `develop`, you can preview the change at
-`https://steffenklug.cloud/canary/`. A second PR from `develop` → `main`
-promotes it to production.
+While your PR is open, a per-commit preview of the change is published to
+`https://blutoniumstrom.com/<short-sha>/` and linked in a sticky PR comment.
+Merging the PR into `main` promotes it to production.
 
 ---
 

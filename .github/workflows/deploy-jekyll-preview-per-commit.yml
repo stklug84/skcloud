@@ -1,0 +1,27 @@
+# Per-commit preview deploy to blutoniumstrom.com.
+#
+# Build/stage/prune/publish logic lives in the central reusable workflow:
+#   stklug84/github-workflows/.github/workflows/jekyll-deploy-preview.yml
+# This caller owns the trigger, permissions, concurrency, and secrets.
+name: Deploy per-commit preview to blutoniumstrom.com
+
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    uses: stklug84/github-workflows/.github/workflows/jekyll-deploy-preview.yml@v1.2.1
+    with:
+      previews-repo: blutoniumstrom/blutoniumstrom.github.io
+      preview-domain: https://blutoniumstrom.com
+    secrets:
+      previews-deploy-token: ${{ secrets.PREVIEWS_DEPLOY_TOKEN }}
