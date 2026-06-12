@@ -55,7 +55,7 @@ preview URL before it goes live.
 | `fix/*`    | Short-lived bug-fix branches off `main`.                |
 | `content/*`| Content-only changes (posts, CV updates, etc.).         |
 
-**Typical flow**
+### Typical flow
 
 ```text
    feat/dark-mode-tweaks  ── push ──▶  per-commit preview at
@@ -89,7 +89,8 @@ bundle install
 If you don't have a system Ruby 4.0.5, use Docker:
 
 ```bash
-docker run --rm -it -p 4000:4000 -v "$PWD:/work" -w /work ruby:4.0.5-slim bash -c "
+docker run --rm -it -p 4000:4000 -v "$PWD:/work" -w /work \
+  ruby:4.0.5-slim bash -c "
   apt-get update -qq && apt-get install -y -qq build-essential git >/dev/null
   gem install bundler --no-document
   bundle install
@@ -134,6 +135,7 @@ preview URL posted as a sticky comment.
 1. Create `_posts/YYYY-MM-DD-your-slug.md`. The date in the filename is
    required.
 2. Add front-matter:
+
    ```yaml
    ---
    title: "Your post title, in sentence case"
@@ -142,6 +144,7 @@ preview URL posted as a sticky comment.
    tags: [azure, platform]
    ---
    ```
+
 3. Write the body in Markdown. Keep paragraphs short. Use `##` and `###`
    for sub-sections (don't reuse `#` — that's the post title).
 4. Preview locally (`jekyll serve`) and check that the post appears in
@@ -155,12 +158,15 @@ when you pass `--drafts` to `jekyll serve`.
 
 Pick the right collection:
 
-| Section         | Folder            | Required fields                                  |
-| --------------- | ----------------- | ------------------------------------------------ |
-| Projects        | `_projects/`      | `title`, `year`, `order` *(for sort)*            |
-| Architectures   | `_architectures/` | `title`, `cloud`, `year`, `order`                |
-| Books           | `_books/`         | `title`, `kind: book`, `author`, `year`          |
-| Trainings       | `_books/`         | `title`, `kind: training`, `provider`, `year`    |
+| Section           | Folder            | Required fields                    |
+| ----------------- | ----------------- | ---------------------------------- |
+| Projects          | `_projects/`      | `title`, `year`, `order`           |
+| Architectures     | `_architectures/` | `title`, `cloud`, `year`, `order`  |
+| Books / Trainings | `_books/`         | `title`, `kind`, `year`            |
+
+`order` controls the sort position within a section. Books use
+`kind: book` plus `author`; trainings use `kind: training` plus
+`provider`.
 
 Common optional fields: `subtitle`, `tags` (list), `image`, `image_alt`,
 `links` (list of `{label, url}`).
@@ -230,13 +236,16 @@ No template changes needed — just edit the YAML and push.
 
 1. Put the file in `assets/images/`.
 2. Reference it in front-matter or Markdown using a `relative_url` path:
+
    ```yaml
    image: /assets/images/my-diagram.svg
    image_alt: "Hub-and-spoke topology with private endpoints."
    ```
+
    ```markdown
-   ![Diagram of a landing zone]({{ '/assets/images/landing-zone.png' | relative_url }})
+   ![Landing zone]({{ '/assets/images/landing-zone.png' | relative_url }})
    ```
+
 3. **Always provide an `alt` text.** It's required for accessibility.
 4. Optimize images before committing:
    - SVG: run through `svgo`.
@@ -262,6 +271,7 @@ etc.). Find the right block, make your change, save.
 This is rare. If you really need it (say, a `/talks/` section):
 
 1. Add a collection in `_config.yml`:
+
    ```yaml
    collections:
      talks:
@@ -273,12 +283,15 @@ This is rare. If you really need it (say, a `/talks/` section):
          layout: item
          section: talks
    ```
+
 2. Add a nav entry:
+
    ```yaml
    nav:
      - title: Talks
        url: /talks/
    ```
+
 3. Create `_talks/` and one Markdown file per item.
 4. Create `talks/index.html`, modeling on `projects/index.html`.
 5. If the section needs a special "back" label, extend the `case`
@@ -298,11 +311,13 @@ scope.
 - One sentence per line for long paragraphs is fine (it makes diffs much
   cleaner) — Markdown still renders them as one paragraph.
 - Use fenced code blocks with a language hint:
+
   ````markdown
   ```bash
   bundle exec jekyll serve
   ```
   ````
+
 - Use blockquotes (`>`) for callouts.
 - Link with `[text](url)` for external links; use
   `{{ '/path' | relative_url }}` for internal links so the per-commit
@@ -318,10 +333,12 @@ scope.
 ### HTML / Liquid
 
 - All asset and link URLs must go through `relative_url`:
+
   ```liquid
   <a href="{{ '/blog/' | relative_url }}">Blog</a>
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
   ```
+
   Hard-coded `/...` paths break the per-commit preview build.
 - Indent with 2 spaces.
 - Prefer semantic tags (`<article>`, `<nav>`, `<section>`, `<header>`,
@@ -349,7 +366,7 @@ scope.
 
 Use a short, imperative subject line, optionally with a scope:
 
-```
+```text
 content(blog): add post on AKS Automatic
 style(cv): tighten timeline spacing on mobile
 fix(nav): close mobile menu on Esc
@@ -374,16 +391,21 @@ Before opening a PR:
    (≤ 760 px) to check the mobile layout.
 3. **Test a preview baseurl.** If you changed any links, run (use any
    placeholder for `<sha>`):
+
    ```bash
    bundle exec jekyll serve --baseurl "/<sha>"
    # then visit http://localhost:4000/<sha>/
    ```
+
    All internal links should still work.
 4. **Run jekyll doctor:**
+
    ```bash
    bundle exec jekyll doctor
    ```
+
 5. **Sanity-check the build:**
+
    ```bash
    bundle exec jekyll build --trace
    # check ./_site/ for the expected files

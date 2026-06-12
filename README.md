@@ -14,9 +14,14 @@ framework. It uses only plugins that are whitelisted by GitHub Pages so the
 site can be built directly by GitHub's hosted Jekyll action.
 
 > **TL;DR**
+>
 > 1. Fork / clone the repo.
-> 2. Edit content as Markdown files in `_posts/`, `_projects/`, `_architectures/`, `_books/`, or `_data/cv.yml`.
-> 3. Push to `main` → production at <https://steffenklug.cloud>. Open a PR → a per-commit preview is published to `https://blutoniumstrom.com/<short-sha>/` and linked in a sticky PR comment.
+> 2. Edit content as Markdown files in `_posts/`, `_projects/`,
+>    `_architectures/`, `_books/`, or `_data/cv.yml`.
+> 3. Push to `main` → production at <https://steffenklug.cloud>. Open a
+>    PR → a per-commit preview is published to
+>    `https://blutoniumstrom.com/<short-sha>/` and linked in a sticky PR
+>    comment.
 
 ---
 
@@ -49,16 +54,19 @@ site can be built directly by GitHub's hosted Jekyll action.
 The site is organized around five top-level sections, each linked from the
 header navigation defined in `_config.yml` (`site.nav`):
 
-| Section                  | URL              | Backed by                    | Index file                  |
-| ------------------------ | ---------------- | ---------------------------- | --------------------------- |
-| Home                     | `/`              | `index.html`                 | `index.html`                |
-| Blog                     | `/blog/`         | `_posts/*.md`                | `blog/index.html`           |
-| Projects                 | `/projects/`     | `_projects/*.md` collection  | `projects/index.html`       |
-| Architectures & Diagrams | `/architectures/`| `_architectures/*.md` coll.  | `architectures/index.html`  |
-| Books & Trainings        | `/books/`        | `_books/*.md` collection     | `books/index.html`          |
-| CV                       | `/cv/`           | `_data/cv.yml`               | `cv/index.html`             |
-| Impressum                | `/impressum/`    | `site.legal` in `_config.yml`| `impressum/index.html`      |
-| Datenschutz              | `/datenschutz/`  | `site.legal` in `_config.yml`| `datenschutz/index.html`    |
+| Section                  | URL               | Backed by                     |
+| ------------------------ | ----------------- | ----------------------------- |
+| Home                     | `/`               | `index.html`                  |
+| Blog                     | `/blog/`          | `_posts/*.md`                 |
+| Projects                 | `/projects/`      | `_projects/*.md` collection   |
+| Architectures & Diagrams | `/architectures/` | `_architectures/*.md` coll.   |
+| Books & Trainings        | `/books/`         | `_books/*.md` collection      |
+| CV                       | `/cv/`            | `_data/cv.yml`                |
+| Impressum                | `/impressum/`     | `site.legal` in `_config.yml` |
+| Datenschutz              | `/datenschutz/`   | `site.legal` in `_config.yml` |
+
+Each section is rendered by an `index.html` in the folder matching its URL
+(for example `blog/index.html` for `/blog/`).
 
 The CV uses a YAML data file (instead of a collection) because all roles are
 rendered on a single scrolling page — there are no per-role detail pages.
@@ -74,7 +82,7 @@ obvious what still needs filling in.
 
 ## Architecture overview
 
-```
+```text
                         ┌──────────────────────────────────────┐
                         │           GitHub repository          │
                         │             stklug84/skcloud         │
@@ -107,20 +115,21 @@ obvious what still needs filling in.
                                               (per-commit preview)
 ```
 
-**Key principles**
+### Key principles
 
 - **Static-first.** All pages are pre-rendered HTML. No runtime back-end.
 - **GitHub-Pages-compatible plugins only** (`jekyll-feed`, `jekyll-seo-tag`,
   `jekyll-sitemap`). No custom plugins, no `_plugins/` folder.
 - **Zero-dep front-end.** Vanilla CSS (custom-properties, no Sass) and one
   small vanilla JS file (no bundler, no framework).
-- **`relative_url` everywhere** so the site works at both `/` and under a per-commit preview subpath like `/<short-sha>/`.
+- **`relative_url` everywhere** so the site works at both `/` and under a
+  per-commit preview subpath like `/<short-sha>/`.
 
 ---
 
 ## Repository layout
 
-```
+```text
 .
 ├── _config.yml                # Jekyll site config (collections, nav, plugins)
 ├── Gemfile                    # Ruby gems (Jekyll 4 + plugins)
@@ -162,7 +171,7 @@ obvious what still needs filling in.
         ├── deploy-jekyll-to-github-pages.yml     # Production deploy (push main)
         ├── deploy-jekyll-preview-per-commit.yml  # Per-commit preview (any branch)
         ├── validate-jekyll-pages.yml             # PR build + quality checks
-        └── pr-preview-comment.yml                # Sticky PR comment with preview URL
+        └── pr-preview-comment.yml                # Sticky PR preview comment
 ```
 
 ---
@@ -370,20 +379,19 @@ Implementation:
 
 ### Component classes
 
-| Class                       | Used for                                     |
-| --------------------------- | -------------------------------------------- |
-| `.container`, `.narrow`     | Max-width wrappers                           |
-| `.btn.primary`, `.btn.ghost`| Primary / secondary buttons                  |
-| `.eyebrow`                  | Small uppercase label above headings         |
-| `.lede`                     | Large secondary paragraph after a heading    |
-| `.cards` / `.card`          | Homepage feature grid                        |
-| `.grid` / `.grid-card`      | Projects / architectures / books grids       |
-| `.post-list` / `.post-row`  | Blog index list                              |
-| `.tags` / `.tags.small`     | Small chip lists                             |
-| `.cv-scroll`, `.cv-scene`,
-  `.cv-timeline`              | CV scrollorama (see CV section above)        |
-| `.reveal`, `.reveal-children`| Opt-in scroll-reveal animation              |
-| `.prose`                    | Long-form article content (blog/item bodies) |
+| Class                         | Used for                                   |
+| ----------------------------- | ------------------------------------------ |
+| `.container`, `.narrow`       | Max-width wrappers                         |
+| `.btn.primary`, `.btn.ghost`  | Primary / secondary buttons                |
+| `.eyebrow`                    | Small uppercase label above headings       |
+| `.lede`                       | Large secondary paragraph after a heading  |
+| `.cards` / `.card`            | Homepage feature grid                      |
+| `.grid` / `.grid-card`        | Projects / architectures / books grids     |
+| `.post-list` / `.post-row`    | Blog index list                            |
+| `.tags` / `.tags.small`       | Small chip lists                           |
+| `.cv-scroll/-scene/-timeline` | CV scrollorama (see CV section above)      |
+| `.reveal`, `.reveal-children` | Opt-in scroll-reveal animation             |
+| `.prose`                      | Long-form article content (blog / items)   |
 
 To animate something on scroll, just add `class="reveal"` (or wrap a list in
 `reveal-children` to stagger its children). The JS handles the rest.
@@ -558,19 +566,19 @@ bundle exec jekyll doctor                 # config sanity check
 
 `_config.yml` is the single source of truth for site-wide settings.
 
-| Key                  | What it controls                                         |
-| -------------------- | -------------------------------------------------------- |
-| `title`              | Site title (used in `<title>`, header brand)             |
-| `tagline`            | Subtitle shown alongside the title                       |
-| `description`        | Default `<meta name="description">` and SEO              |
-| `author`             | Used in the footer copyright                             |
-| `url` / `baseurl`    | Canonical site URL (no trailing slash)                   |
-| `permalink`          | Blog post URL pattern                                    |
-| `plugins`            | Only GitHub-Pages-allowed plugins                        |
-| `collections`        | Defines `projects`, `architectures`, `books`             |
-| `defaults`           | Default `layout` per content type                        |
-| `nav`                | Top navigation items (used by `_includes/header.html`)   |
-| `social`             | GitHub / LinkedIn / email used in the footer             |
+| Key               | What it controls                                        |
+| ----------------- | ------------------------------------------------------- |
+| `title`           | Site title (used in `<title>`, header brand)            |
+| `tagline`         | Subtitle shown alongside the title                      |
+| `description`     | Default `<meta name="description">` and SEO             |
+| `author`          | Used in the footer copyright                            |
+| `url` / `baseurl` | Canonical site URL (no trailing slash)                  |
+| `permalink`       | Blog post URL pattern                                   |
+| `plugins`         | Only GitHub-Pages-allowed plugins                       |
+| `collections`     | Defines `projects`, `architectures`, `books`            |
+| `defaults`        | Default `layout` per content type                       |
+| `nav`             | Top navigation items (used by `_includes/header.html`)  |
+| `social`          | GitHub / LinkedIn / email used in the footer            |
 
 To add another nav item:
 
@@ -585,12 +593,14 @@ Then create `talks/index.html` (or a collection if you want detail pages).
 ### Adding a new collection
 
 1. Add the collection to `_config.yml`:
+
    ```yaml
    collections:
      talks:
        output: true
        permalink: /talks/:path/
    ```
+
 2. Add a default `layout: item` and `section: talks` so item pages render
    with the standard detail template.
 3. Create `_talks/` and put one Markdown file per talk inside.

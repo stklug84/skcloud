@@ -101,6 +101,7 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - README.md
+  - CONTRIBUTING.md
   - vendor
   - node_modules
   - .github
