@@ -5,6 +5,15 @@
 # This caller owns the trigger, permissions, and concurrency.
 #
 # Branch protection: the required status check is exposed as `validate / build`.
+# The `validate` job key is unchanged, so that check name is preserved. The
+# added `generate` job exposes a NEW (non-required) check `generate / Generate
+# CV data`; it does not affect the existing `validate / build` required check.
+#
+# Pattern A (prebuild): a `generate` job fetches the canonical cv.yaml from
+# stklug84/curriculum-vitae (raw, main — DECISION 5a) and runs
+# stklug84/actions/cv/parse@v2 in web mode to emit cv.yml. The artifact is
+# handed to the reusable workflow via `prebuild-artifact` / `prebuild-into`,
+# which extracts cv.yml into _data/ before the Jekyll build.
 name: Validate Jekyll Pages
 
 on:
@@ -20,5 +29,52 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Generate _data/cv.yml from the canonical bilingual cv.yaml.
+  generate:
+    name: Generate CV data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch canonical cv.yaml (curriculum-vitae @ main)
+        run: |
+          set -euo pipefail
+          # DECISION 5a: fetch raw from main. The follow-up issue tracks
+          # switching to a pinned release asset (5b) once the source
+          # stabilizes.
+          SHA="$(gh api repos/stklug84/curriculum-vitae/commits/main -q .sha 2>/dev/null || true)"
+          if [ -n "$SHA" ]; then
+            echo "Resolved curriculum-vitae main commit: $SHA"
+          else
+            echo "Could not resolve commit SHA (continuing with raw fetch)."
+          fi
+          curl -fsSL \
+            https://raw.githubusercontent.com/stklug84/curriculum-vitae/main/data/cv.yaml \
+            -o cv.yaml
+          echo "Fetched cv.yaml ($(wc -c < cv.yaml) bytes)."
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Parse CV (web mode)
+        uses: stklug84/actions/cv/parse@v2
+        with:
+          mode: web
+          source: cv.yaml
+          out-dir: "."
+
+      - name: Upload cv.yml artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cv-web-data
+          path: cv.yml
+          if-no-files-found: error
+
+  # Build + advisory checks via the reusable workflow. The `validate` job key
+  # is preserved so the required check `validate / build` is unchanged.
   validate:
-    uses: stklug84/github-workflows/.github/workflows/jekyll-validate-pages.yml@v1.5.0
+    needs: generate
+    uses: stklug84/github-workflows/.github/workflows/jekyll-validate-pages.yml@v1.6.0
+    with:
+      prebuild-artifact: cv-web-data
+      prebuild-into: "_data"
