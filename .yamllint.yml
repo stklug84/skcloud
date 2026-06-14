@@ -9,8 +9,12 @@ rules:
   truthy:
     allowed-values: ["true", "false"]
     check-keys: false
+  # SHA-pinned reusable-workflow `uses:` lines (40-char hash + version
+  # comment) can exceed 120 chars and cannot be wrapped. Match the sibling
+  # curriculum-vitae repo's threshold and treat over-length as a warning.
   line-length:
-    max: 120
+    max: 130
+    level: warning
   # Jekyll front matter / workflow files commonly omit the document start.
   document-start: disable
   comments:
