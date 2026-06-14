@@ -5,9 +5,9 @@
 # This file owns the triggers, permissions, and concurrency, then
 # delegates the actual build (Bundler) and deploy.
 #
-# Pattern A (prebuild): a `generate` job fetches the canonical cv.yaml
-# from stklug84/curriculum-vitae (raw, main — DECISION 5a) and runs
-# stklug84/actions/cv/parse@v2 in web mode to emit cv.yml. The artifact
+# Prebuild flow: a `generate` job fetches the canonical cv.yaml
+# from stklug84/curriculum-vitae (raw, from main) and runs
+# stklug84/actions/cv/parse in web mode to emit cv.yml. The artifact
 # is handed to the reusable workflow via `prebuild-artifact` /
 # `prebuild-into`, which extracts cv.yml into _data/ before the Jekyll
 # build (overwriting the committed fallback _data/cv.yml).
@@ -45,9 +45,8 @@ jobs:
       - name: Fetch canonical cv.yaml (curriculum-vitae @ main)
         run: |
           set -euo pipefail
-          # DECISION 5a: fetch raw from main. The follow-up issue tracks
-          # switching to a pinned release asset (5b) once the source
-          # stabilizes.
+          # Fetch the raw file from main. A tracking issue covers
+          # switching to a pinned release asset once the source stabilizes.
           SHA="$(gh api repos/stklug84/curriculum-vitae/commits/main -q .sha 2>/dev/null || true)"
           if [ -n "$SHA" ]; then
             echo "Resolved curriculum-vitae main commit: $SHA"
