@@ -62,7 +62,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Parse CV (web mode)
-        uses: stklug84/actions/cv/parse@v2
+        uses: stklug84/actions/cv/parse@cb91fdcefccd47f24449549389216a5981a6455c  # v2.2.1
         with:
           mode: web
           source: cv.yaml
@@ -80,7 +80,7 @@ jobs:
   # uses/with/needs/secrets (no steps).
   deploy:
     needs: generate
-    uses: stklug84/github-workflows/.github/workflows/jekyll-deploy-pages.yml@v1.6.0
+    uses: stklug84/github-workflows/.github/workflows/jekyll-deploy-pages.yml@ef8ccb7f951405e721fa4891008c45c47eb8dcb8  # v1.6.0
     with:
       prebuild-artifact: cv-web-data
       prebuild-into: "_data"
