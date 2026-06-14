@@ -1,21 +1,26 @@
 #!/usr/bin/env bash
-# Regenerate _data/cv.yml locally from the canonical curriculum-vitae source.
-#
-# In CI this is done by the `generate` job in the deploy/validate workflows
-# (fetch cv.yaml from stklug84/curriculum-vitae @ main, then run
-# stklug84/actions/cv/parse@v2 in web mode). For local `jekyll serve`, this
-# script reproduces that step so you preview real data instead of the
-# committed fallback _data/cv.yml.
-#
-# Usage:
-#   scripts/gen-cv.sh                 # fetch cv.yaml from curriculum-vitae main
-#   CV_SOURCE=/path/to/cv.yaml \
-#     scripts/gen-cv.sh               # use a local cv.yaml instead of fetching
-#   PARSE_DIR=/path/to/actions/cv/parse \
-#     scripts/gen-cv.sh               # point at a local checkout of the action
-#
-# Requirements: python3 with PyYAML + Jinja2 (pip install --user pyyaml jinja2),
-# and a checkout of stklug84/actions (for cv/parse/scripts/parse.py).
+# @author:
+#	Steffen Klug <45033201+stklug84@users.noreply.github.com>
+# @dependencies:
+#	python3 (>= 3.9), PyYAML, Jinja2 (pip install --user pyyaml jinja2)
+#	A checkout of stklug84/actions for cv/parse/scripts/parse.py. Point
+#	PARSE_DIR at the action root; defaults to a local checkout at
+#	/Volumes/Data/repositories/ghec/stklug84/actions/cv/parse.
+# @description:
+#	Regenerate _data/cv.yml locally from the canonical curriculum-vitae
+#	source. In CI this is done by the `generate` job in the
+#	deploy/validate workflows (fetch cv.yaml from
+#	stklug84/curriculum-vitae @ main, then run stklug84/actions/cv/parse
+#	in web mode). For local `jekyll serve`, this script reproduces that
+#	step so you preview real data instead of the committed fallback
+#	_data/cv.yml.
+# @arguments:
+#	none (configured via environment variables, see @usage)
+# @usage:
+#	scripts/gen-cv.sh                          # fetch cv.yaml from main
+#	CV_SOURCE=/path/to/cv.yaml scripts/gen-cv.sh   # use a local cv.yaml
+#	PARSE_DIR=/path/to/actions/cv/parse scripts/gen-cv.sh  # local action
+
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
