@@ -11,8 +11,8 @@ description: A scrollable CV — career, skills, and certifications.
   <div class="container">
     <header class="page-header narrow cv-intro">
       <p class="eyebrow">CV</p>
-      <h1>{{ cv.name }} <span class="muted">— {{ cv.title }}</span></h1>
-      <p class="lede">{{ cv.summary }}</p>
+      <h1>{{ cv.name | escape }} <span class="muted">— {{ cv.title | escape }}</span></h1>
+      <p class="lede">{{ cv.summary | escape }}</p>
     </header>
   </div>
 
@@ -33,7 +33,7 @@ description: A scrollable CV — career, skills, and certifications.
           {% for r in cv.roles %}
             <li data-target="role-{{ forloop.index }}">
               <span class="dot" aria-hidden="true"></span>
-              <span class="period tabular">{{ r.period }}</span>
+              <span class="period tabular">{{ r.period | escape }}</span>
               <span class="role-mini">{{ r.role | escape }}</span>
             </li>
           {% endfor %}
@@ -51,18 +51,18 @@ description: A scrollable CV — career, skills, and certifications.
           data-index="{{ idx }}"
           {% if r.bg %}data-bg="{{ r.bg | relative_url }}"{% endif %}
         >
-          <p class="eyebrow tabular">{{ r.period }} · {{ r.org }}</p>
+          <p class="eyebrow tabular">{{ r.period | escape }} · {{ r.org | escape }}</p>
           <h2>{{ r.role | escape }}</h2>
-          <p class="muted">{{ r.location }}</p>
-          <p class="lede">{{ r.summary }}</p>
+          <p class="muted">{{ r.location | escape }}</p>
+          <p class="lede">{{ r.summary | escape }}</p>
           {% if r.bullets %}
             <ul class="bullets">
-              {% for b in r.bullets %}<li>{{ b }}</li>{% endfor %}
+              {% for b in r.bullets %}<li>{{ b | escape }}</li>{% endfor %}
             </ul>
           {% endif %}
           {% if r.tags %}
             <ul class="tags">
-              {% for t in r.tags %}<li>{{ t }}</li>{% endfor %}
+              {% for t in r.tags %}<li>{{ t | escape }}</li>{% endfor %}
             </ul>
           {% endif %}
         </article>
@@ -81,7 +81,7 @@ description: A scrollable CV — career, skills, and certifications.
                 <span class="cv-cue-monogram">{{ r.monogram | default: r.org | slice: 0, 2 | upcase }}</span>
               {% endif %}
             </div>
-            <span class="cv-cue-org">{{ r.org }}</span>
+            <span class="cv-cue-org">{{ r.org | escape }}</span>
           </li>
         {% endfor %}
       </ol>
@@ -99,7 +99,7 @@ description: A scrollable CV — career, skills, and certifications.
           <li>
             <h3>{{ g.group | escape }}</h3>
             <ul class="tags">
-              {% for s in g.items %}<li>{{ s }}</li>{% endfor %}
+              {% for s in g.items %}<li>{{ s | escape }}</li>{% endfor %}
             </ul>
           </li>
         {% endfor %}
@@ -113,7 +113,7 @@ description: A scrollable CV — career, skills, and certifications.
           <h2>Verified credentials.</h2>
         </header>
         <ul class="cert-list">
-          {% for c in cv.certifications %}<li>{{ c }}</li>{% endfor %}
+          {% for c in cv.certifications %}<li>{{ c | escape }}</li>{% endfor %}
         </ul>
       </section>
     {% endif %}

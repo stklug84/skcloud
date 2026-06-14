@@ -195,6 +195,32 @@ and appears on the section's index page sorted by `order`.
 
 ### Update the CV
 
+> **Where CV data comes from.** In CI, `_data/cv.yml` is **generated** from a
+> canonical bilingual source — `data/cv.yaml` in
+> [`stklug84/curriculum-vitae`](https://github.com/stklug84/curriculum-vitae)
+> (`main`) — by the `generate` job in the deploy/validate workflows, which runs
+> [`stklug84/actions/cv/parse@v2`](https://github.com/stklug84/actions) in web
+> mode and hands the result to the reusable workflow's `prebuild-artifact`
+> input. The reusable build extracts that `cv.yml` into `_data/` before the
+> Jekyll build. The `_data/cv.yml` **committed** in this repo is a **fallback**
+> used only if the fetch/parse step fails — keep it lint-clean and reasonably
+> up to date, but the canonical edits happen in `curriculum-vitae`.
+>
+> **Regenerate locally for `jekyll serve`.** The committed fallback is what you
+> see by default. To preview real data, regenerate it (requires `python3` with
+> `pyyaml` + `jinja2`, and a checkout of `stklug84/actions`):
+>
+> ```bash
+> pip install --user pyyaml jinja2
+> # Fetch from curriculum-vitae main + parse (web mode) -> _data/cv.yml:
+> scripts/gen-cv.sh
+> # Or use a local source / local action checkout:
+> CV_SOURCE=/path/to/cv.yaml PARSE_DIR=/path/to/actions/cv/parse scripts/gen-cv.sh
+> ```
+>
+> Do **not** commit the locally generated `_data/cv.yml`; restore the fallback
+> (`git checkout -- _data/cv.yml`) before committing.
+
 The CV is **entirely** driven by `_data/cv.yml`. To add a new role:
 
 ```yaml
