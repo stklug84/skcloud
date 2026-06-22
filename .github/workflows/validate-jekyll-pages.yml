@@ -1,14 +1,17 @@
 ---
 # PR validation.
 #
-# Build + advisory quality checks live in the central reusable workflow:
+# Build + quality checks live in the central reusable workflow:
 #   stklug84/github-workflows/.github/workflows/jekyll-validate-pages.yml
 # This caller owns the trigger, permissions, and concurrency.
 #
-# Branch protection: the required status check is exposed as `validate / build`.
-# The `validate` job key is unchanged, so that check name is preserved. The
-# added `generate` job exposes a NEW (non-required) check `generate / Generate
-# CV data`; it does not affect the existing `validate / build` required check.
+# Branch protection: every quality check now reports real pass/fail status
+# (the reusable workflow dropped continue-on-error in v1.7.0). The ruleset
+# requires `validate / build` plus the renamed lint checks (`validate /
+# yaml-lint`, `validate / markdown-lint`, etc.). The `validate` job key is
+# unchanged, so the `validate / build` check name is preserved. The added
+# `generate` job exposes a NEW (non-required) check `generate / Generate CV
+# data`; it does not affect the required checks.
 #
 # Prebuild flow: a `generate` job fetches the canonical cv.yml from
 # stklug84/curriculum-vitae (raw, from main) and runs
@@ -70,12 +73,12 @@ jobs:
           path: cv.yml
           if-no-files-found: error
 
-  # Build + advisory checks via the reusable workflow. The `validate` job key
+  # Build + quality checks via the reusable workflow. The `validate` job key
   # is preserved so the required check `validate / build` is unchanged.
   validate:
     needs: generate
     # yamllint disable-line rule:line-length
-    uses: stklug84/github-workflows/.github/workflows/jekyll-validate-pages.yml@ef8ccb7f951405e721fa4891008c45c47eb8dcb8  # v1.6.0
+    uses: stklug84/github-workflows/.github/workflows/jekyll-validate-pages.yml@50a6d4b1ab8a8a817e552c1f53901661368673e5  # v1.7.0
     with:
       prebuild-artifact: cv-web-data
       prebuild-into: "_data"
