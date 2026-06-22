@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Fetch canonical cv.yml (curriculum-vitae @ main)
         run: |
@@ -81,7 +81,7 @@ jobs:
   deploy:
     needs: generate
     # yamllint disable-line rule:line-length
-    uses: stklug84/github-workflows/.github/workflows/jekyll-deploy-pages.yml@ef8ccb7f951405e721fa4891008c45c47eb8dcb8  # v1.6.0
+    uses: stklug84/github-workflows/.github/workflows/jekyll-deploy-pages.yml@50a6d4b1ab8a8a817e552c1f53901661368673e5  # v1.7.0
     with:
       prebuild-artifact: cv-web-data
       prebuild-into: "_data"
