@@ -1,21 +1,21 @@
 ---
-# yamllint configuration for CI (validate / yaml-lint).
-# Checked paths: .github/ and _config.yml (see validate-jekyll-pages.yml).
+# yamllint configuration — shared baseline across stklug84 repos.
+# Maintainer: Steffen Klug <45033201+stklug84@users.noreply.github.com>
 extends: default
 
 rules:
-  # GitHub Actions uses `on:` as a top-level key; yamllint would otherwise
-  # flag it as a truthy value.
+  # Two-space indentation.
+  indentation:
+    spaces: 2
+  # Over-length is a warning, not an error.
+  line-length:
+    max: 120
+    level: warning
+  # GitHub Actions uses a bare `on:` top-level key; without this yamllint
+  # flags it as truthy. Configuring it here removes the need for per-file
+  # `# yamllint disable-line rule:truthy` comments.
   truthy:
     allowed-values: ["true", "false"]
     check-keys: false
-  # SHA-pinned reusable-workflow `uses:` lines (40-char hash + version
-  # comment) can exceed 120 chars and cannot be wrapped. Match the sibling
-  # curriculum-vitae repo's threshold and treat over-length as a warning.
-  line-length:
-    max: 130
-    level: warning
-  # Jekyll front matter / workflow files commonly omit the document start.
-  document-start: disable
   comments:
     min-spaces-from-content: 1
