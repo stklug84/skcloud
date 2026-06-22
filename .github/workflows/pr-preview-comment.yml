@@ -1,9 +1,15 @@
 ---
-# PR preview comment.
-#
-# The sticky-comment logic lives in the central reusable workflow:
-#   stklug84/github-workflows/.github/workflows/misc-pr-preview-comment.yml
-# This caller owns the trigger, permissions, and concurrency.
+# title: PR preview comment workflow
+# authors:
+#   - Steffen Klug <45033201+stklug84@users.noreply.github.com>
+# date: 2026-06-22
+# keywords: [infrastructure, jekyll, ci]
+# comment: |
+#   Posts a sticky PR comment with the preview URL. The sticky-comment
+#   logic lives in the central reusable workflow:
+#     stklug84/github-workflows/.github/workflows/misc-pr-preview-comment.yml
+#   This caller owns the trigger, permissions, and concurrency.
+# ---
 name: PR preview comment
 
 on:

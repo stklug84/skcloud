@@ -1,17 +1,23 @@
 ---
-# Production deploy to GitHub Pages.
+# title: Deploy Jekyll to GitHub Pages workflow
+# authors:
+#   - Steffen Klug <45033201+stklug84@users.noreply.github.com>
+# date: 2026-06-22
+# keywords: [infrastructure, jekyll, deploy]
+# comment: |
+#   Production deploy to GitHub Pages. The build/deploy logic lives in
+#   the central reusable workflow:
+#     stklug84/github-workflows/.github/workflows/jekyll-deploy-pages.yml
+#   This file owns the triggers, permissions, and concurrency, then
+#   delegates the actual build (Bundler) and deploy.
 #
-# The build/deploy logic lives in the central reusable workflow:
-#   stklug84/github-workflows/.github/workflows/jekyll-deploy-pages.yml
-# This file owns the triggers, permissions, and concurrency, then
-# delegates the actual build (Bundler) and deploy.
-#
-# Prebuild flow: a `generate` job fetches the canonical cv.yml
-# from stklug84/curriculum-vitae (raw, from main) and runs
-# stklug84/actions/cv/parse in web mode to emit cv.yml. The artifact
-# is handed to the reusable workflow via `prebuild-artifact` /
-# `prebuild-into`, which extracts cv.yml into _data/ before the Jekyll
-# build (overwriting the committed fallback _data/cv.yml).
+#   Prebuild flow: a `generate` job fetches the canonical cv.yml from
+#   stklug84/curriculum-vitae (raw, from main) and runs
+#   stklug84/actions/cv/parse in web mode to emit cv.yml. The artifact
+#   is handed to the reusable workflow via `prebuild-artifact` /
+#   `prebuild-into`, which extracts cv.yml into _data/ before the
+#   Jekyll build (overwriting the committed fallback _data/cv.yml).
+# ---
 name: Deploy Jekyll to GitHub Pages
 
 on:

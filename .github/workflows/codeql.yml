@@ -1,13 +1,19 @@
 ---
-# CodeQL code scanning.
-#
-# Required by the "Deploy productive" branch ruleset (code_scanning rule,
-# tool: CodeQL). Analyzes:
-#   - actions:    the workflows in .github/workflows/* (expression
-#                 injection, excessive permissions, untrusted checkout, ...)
-#   - javascript: the vanilla JS in assets/js/
-#
-# Modeled on stklug84/github-workflows/.github/workflows/codeql.yml.
+# title: CodeQL workflow
+# authors:
+#   - Steffen Klug <45033201+stklug84@users.noreply.github.com>
+# date: 2026-06-22
+# keywords: [infrastructure, security]
+# comment: |
+#   CodeQL code scanning, required by the "Deploy productive" branch
+#   ruleset (code_scanning rule, tool: CodeQL). Analyzes:
+#     - actions:    the workflows in .github/workflows/* (expression
+#                   injection, excessive permissions, untrusted
+#                   checkout, artifact/cache poisoning, ...)
+#     - javascript: the vanilla JS in assets/js/
+#   Modeled on
+#   stklug84/github-workflows/.github/workflows/codeql.yml.
+# ---
 name: CodeQL
 
 on:
