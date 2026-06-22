@@ -1,7 +1,7 @@
 # FALLBACK CV DATA — committed so the site builds even if the prebuild
 # fetch/parse fails. In CI this file is OVERWRITTEN at build time by the
-# `generate` job: it fetches the canonical data/cv.yaml from
-# stklug84/curriculum-vitae (main) and runs stklug84/actions/cv/parse@v2
+# `generate` job: it fetches the canonical data/cv.yml from
+# stklug84/curriculum-vitae (main) and runs stklug84/actions/cv/parse
 # (web mode), then the reusable workflow extracts the generated cv.yml
 # into _data/. To regenerate locally, see scripts/gen-cv.sh / CONTRIBUTING.md.
 name: Steffen Klug

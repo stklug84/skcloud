@@ -5,7 +5,7 @@
 # This file owns the triggers, permissions, and concurrency, then
 # delegates the actual build (Bundler) and deploy.
 #
-# Prebuild flow: a `generate` job fetches the canonical cv.yaml
+# Prebuild flow: a `generate` job fetches the canonical cv.yml
 # from stklug84/curriculum-vitae (raw, from main) and runs
 # stklug84/actions/cv/parse in web mode to emit cv.yml. The artifact
 # is handed to the reusable workflow via `prebuild-artifact` /
@@ -34,7 +34,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Generate _data/cv.yml from the canonical bilingual cv.yaml.
+  # Generate _data/cv.yml from the canonical bilingual cv.yml.
   generate:
     name: Generate CV data
     runs-on: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Fetch canonical cv.yaml (curriculum-vitae @ main)
+      - name: Fetch canonical cv.yml (curriculum-vitae @ main)
         run: |
           set -euo pipefail
           # Fetch the raw file from main. A tracking issue covers
@@ -54,9 +54,9 @@ jobs:
             echo "Could not resolve commit SHA (continuing with raw fetch)."
           fi
           curl -fsSL \
-            https://raw.githubusercontent.com/stklug84/curriculum-vitae/main/data/cv.yaml \
-            -o cv.yaml
-          echo "Fetched cv.yaml ($(wc -c < cv.yaml) bytes)."
+            https://raw.githubusercontent.com/stklug84/curriculum-vitae/main/data/cv.yml \
+            -o cv.yml
+          echo "Fetched cv.yml ($(wc -c < cv.yml) bytes)."
         env:
           GH_TOKEN: ${{ github.token }}
 
@@ -64,7 +64,7 @@ jobs:
         uses: stklug84/actions/cv/parse@cb91fdcefccd47f24449549389216a5981a6455c  # v2.2.1
         with:
           mode: web
-          source: cv.yaml
+          source: cv.yml
           out-dir: "."
 
       - name: Upload cv.yml artifact

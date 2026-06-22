@@ -9,7 +9,7 @@
 # @description:
 #	Regenerate _data/cv.yml locally from the canonical curriculum-vitae
 #	source. In CI this is done by the `generate` job in the
-#	deploy/validate workflows (fetch cv.yaml from
+#	deploy/validate workflows (fetch cv.yml from
 #	stklug84/curriculum-vitae @ main, then run stklug84/actions/cv/parse
 #	in web mode). For local `jekyll serve`, this script reproduces that
 #	step so you preview real data instead of the committed fallback
@@ -17,8 +17,8 @@
 # @arguments:
 #	none (configured via environment variables, see @usage)
 # @usage:
-#	scripts/gen-cv.sh                          # fetch cv.yaml from main
-#	CV_SOURCE=/path/to/cv.yaml scripts/gen-cv.sh   # use a local cv.yaml
+#	scripts/gen-cv.sh                          # fetch cv.yml from main
+#	CV_SOURCE=/path/to/cv.yml scripts/gen-cv.sh   # use a local cv.yml
 #	PARSE_DIR=/path/to/actions/cv/parse scripts/gen-cv.sh  # local action
 
 set -euo pipefail
@@ -27,15 +27,15 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-# 1. Obtain the canonical bilingual cv.yaml.
+# 1. Obtain the canonical bilingual cv.yml.
 if [ -n "${CV_SOURCE:-}" ]; then
   echo "Using local CV source: $CV_SOURCE"
-  cp "$CV_SOURCE" "$WORK/cv.yaml"
+  cp "$CV_SOURCE" "$WORK/cv.yml"
 else
-  echo "Fetching cv.yaml from stklug84/curriculum-vitae @ main ..."
+  echo "Fetching cv.yml from stklug84/curriculum-vitae @ main ..."
   curl -fsSL \
-    https://raw.githubusercontent.com/stklug84/curriculum-vitae/main/data/cv.yaml \
-    -o "$WORK/cv.yaml"
+    https://raw.githubusercontent.com/stklug84/curriculum-vitae/main/data/cv.yml \
+    -o "$WORK/cv.yml"
 fi
 
 # 2. Locate the action's parse.py.
@@ -49,7 +49,7 @@ fi
 
 # 3. Emit cv.yml (web mode) and place it at _data/cv.yml.
 python3 "$PARSE_PY" \
-  --source "$WORK/cv.yaml" \
+  --source "$WORK/cv.yml" \
   --mode web \
   --out-dir "$WORK"
 
