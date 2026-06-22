@@ -1,0 +1,46 @@
+---
+# markdownlint configuration — shared baseline across stklug84 repos.
+# Maintainer: Steffen Klug <45033201+stklug84@users.noreply.github.com>
+# Deviations from defaults:
+#   MD010 — allow hard tabs in code blocks
+#   MD013 — line length 120; tables and code blocks exempt
+#   MD024 — duplicate headings allowed unless siblings
+#   MD060 — table column-alignment check disabled
+# Jekyll content deviations (posts carry inline HTML / fragment files):
+#   MD033 — allow inline HTML
+#   MD036 — allow emphasis used as heading
+#   MD040 — allow fenced code without a language
+#   MD041 — first line need not be a top-level heading
+#   MD049 — emphasis-style consistency relaxed
+
+# Default state for all rules
+default: true
+
+# Path to configuration file to extend
+extends: null
+
+# MD010/no-hard-tabs - Hard tabs
+MD010:
+  code_blocks: false
+  ignore_code_languages: []
+  spaces_per_tab: 1
+
+# MD013/line-length - Line length
+MD013:
+  line_length: 120
+  tables: false
+  code_blocks: false
+
+# MD024/no-duplicate-heading - Multiple headings with the same content
+MD024:
+  siblings_only: true
+
+# MD060/table-column-style - Table column style
+MD060: false
+
+# Jekyll content deviations
+MD033: false
+MD036: false
+MD040: false
+MD041: false
+MD049: false

@@ -1,3 +1,4 @@
+---
 # PR validation.
 #
 # Build + advisory quality checks live in the central reusable workflow:
@@ -73,6 +74,7 @@ jobs:
   # is preserved so the required check `validate / build` is unchanged.
   validate:
     needs: generate
+    # yamllint disable-line rule:line-length
     uses: stklug84/github-workflows/.github/workflows/jekyll-validate-pages.yml@ef8ccb7f951405e721fa4891008c45c47eb8dcb8  # v1.6.0
     with:
       prebuild-artifact: cv-web-data

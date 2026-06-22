@@ -1,3 +1,4 @@
+---
 # Production deploy to GitHub Pages.
 #
 # The build/deploy logic lives in the central reusable workflow:
@@ -79,6 +80,7 @@ jobs:
   # uses/with/needs/secrets (no steps).
   deploy:
     needs: generate
+    # yamllint disable-line rule:line-length
     uses: stklug84/github-workflows/.github/workflows/jekyll-deploy-pages.yml@ef8ccb7f951405e721fa4891008c45c47eb8dcb8  # v1.6.0
     with:
       prebuild-artifact: cv-web-data
