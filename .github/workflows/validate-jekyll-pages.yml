@@ -86,7 +86,7 @@ jobs:
   validate:
     needs: generate
     # yamllint disable-line rule:line-length
-    uses: stklug84/github-workflows/.github/workflows/jekyll-validate-pages.yml@50a6d4b1ab8a8a817e552c1f53901661368673e5  # v1.7.0
+    uses: stklug84/github-workflows/.github/workflows/jekyll-validate-pages.yml@986b646115be694c7b7e5fffe3a28ae98be920fa  # v1.17.0
     with:
       prebuild-artifact: cv-web-data
       prebuild-into: "_data"
