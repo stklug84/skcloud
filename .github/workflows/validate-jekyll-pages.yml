@@ -68,7 +68,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Parse CV (web mode)
-        uses: stklug84/actions/cv/parse@071f9e9c98cf0660f0d080ac13cecfc415dac81b  # v2.15.0
+        uses: stklug84/actions/cv/parse@9a898e1f4d319b0f175ac25d12b24e046dd0f190  # v2.16.0
         with:
           mode: web
           source: cv.yml
@@ -89,7 +89,7 @@ jobs:
   validate:
     needs: generate
     # yamllint disable-line rule:line-length
-    uses: stklug84/github-workflows/.github/workflows/jekyll-validate-pages.yml@8402ef6fc35ec95e8c5a5e9ea5ea637e270a87f2  # v1.19.1
+    uses: stklug84/github-workflows/.github/workflows/jekyll-validate-pages.yml@74e332dac4787b3f4f9fe2f896a6a0b3a03b9385  # v1.20.0
     with:
       prebuild-artifact: cv-web-data
       prebuild-into: "_data"
