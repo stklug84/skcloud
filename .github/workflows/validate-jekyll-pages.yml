@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Fetch canonical cv.yml (curriculum-vitae @ main)
         run: |
@@ -68,7 +68,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Parse CV (web mode)
-        uses: stklug84/actions/cv/parse@fcf81eaf154cfbf73ba88118d5c045dbf5c3815e  # v2.17.0
+        uses: stklug84/actions/cv/parse@f90d43d1a4e9f22cbfaa8a87b1555981c407e124  # v2.17.1
         with:
           mode: web
           source: cv.yml
@@ -78,7 +78,7 @@ jobs:
           out-dir: "."
 
       - name: Upload cv.yml artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: cv-web-data
           path: cv.yml
@@ -89,7 +89,7 @@ jobs:
   validate:
     needs: generate
     # yamllint disable-line rule:line-length
-    uses: stklug84/github-workflows/.github/workflows/jekyll-validate-pages.yml@176a7a46472032661cab6f62994177d107265cce  # v1.21.0
+    uses: stklug84/github-workflows/.github/workflows/jekyll-validate-pages.yml@e4dba2dea8e228278d17286685a750d693e347cc  # v1.22.2
     with:
       prebuild-artifact: cv-web-data
       prebuild-into: "_data"
