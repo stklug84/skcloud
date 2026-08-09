@@ -27,6 +27,6 @@ concurrency:
 
 jobs:
   comment:
-    uses: stklug84/github-workflows/.github/workflows/misc-pr-preview-comment.yml@37eda704c0796d9b8f660eb0acd1c222e6666476  # v1.22.1
+    uses: stklug84/github-workflows/.github/workflows/misc-pr-preview-comment.yml@e4dba2dea8e228278d17286685a750d693e347cc  # v1.22.2
     with:
       preview-domain: https://blutoniumstrom.com
