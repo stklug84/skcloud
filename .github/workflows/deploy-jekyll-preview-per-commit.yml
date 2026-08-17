@@ -26,7 +26,7 @@ concurrency:
 
 jobs:
   preview:
-    uses: stklug84/github-workflows/.github/workflows/jekyll-deploy-preview.yml@e4dba2dea8e228278d17286685a750d693e347cc  # v1.22.2
+    uses: stklug84/github-workflows/.github/workflows/jekyll-deploy-preview.yml@e8b7009127c21bd66249ad5df0a0112c1d4f6553  # v4.0.0
     with:
       previews-repo: blutoniumstrom/blutoniumstrom.github.io
       preview-domain: https://blutoniumstrom.com
