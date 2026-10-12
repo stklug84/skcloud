@@ -68,7 +68,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Parse CV (web mode)
-        uses: stklug84/actions/cv/parse@f90d43d1a4e9f22cbfaa8a87b1555981c407e124  # v2.17.1
+        uses: stklug84/actions/cv/parse@c6c3adbc4140cbf096c0c61c30b4fa96ff82b8dd  # v2.19.0
         with:
           mode: web
           source: cv.yml
@@ -78,7 +78,7 @@ jobs:
           out-dir: "."
 
       - name: Upload cv.yml artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: cv-web-data
           path: cv.yml
@@ -90,7 +90,7 @@ jobs:
   deploy:
     needs: generate
     # yamllint disable-line rule:line-length
-    uses: stklug84/github-workflows/.github/workflows/jekyll-deploy-pages.yml@e4dba2dea8e228278d17286685a750d693e347cc  # v1.22.2
+    uses: stklug84/github-workflows/.github/workflows/jekyll-deploy-pages.yml@e099d4771b62e7814a0206424b176b91a1747ecc  # v4.1.0
     with:
       prebuild-artifact: cv-web-data
       prebuild-into: "_data"
